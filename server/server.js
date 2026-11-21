@@ -633,10 +633,15 @@ function bootstrap() {
   db.init();
 
   // Primera ejecución: insertar noticias de demostración si la BD está vacía
+  const demoMode = db.getConfig('demo_mode', '1') === '1';
   const count = db.getDb().prepare('SELECT COUNT(*) c FROM news').get().c;
-  if (count === 0) {
+  if (count === 0 && demoMode) {
     const added = db.seedDemoNews();
     console.log(`[server] Base de datos vacía: insertadas ${added} noticias de demostración.`);
+  }
+  if (!demoMode) {
+    const del = db.getDb().prepare('DELETE FROM news WHERE is_demo = 1').run();
+    if (del.changes > 0) console.log(`[server] Eliminadas ${del.changes} noticias de demostración.`);
   }
 
   server.listen(PORT, HOST, () => {
