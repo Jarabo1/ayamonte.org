@@ -152,6 +152,19 @@ CREATE TABLE IF NOT EXISTS agenda (
   is_demo     INTEGER NOT NULL DEFAULT 1,
   created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS recipes (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  title         TEXT NOT NULL,
+  origin        TEXT,
+  ingredients   TEXT,
+  steps         TEXT,
+  source_name   TEXT,
+  source_url    TEXT,
+  image_url     TEXT,
+  is_demo       INTEGER NOT NULL DEFAULT 0,
+  created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `;
 
 /* ------------------------------------------------------------------ */
@@ -594,6 +607,35 @@ function deleteAgenda(id) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Recetas gastronómicas                                               */
+/* ------------------------------------------------------------------ */
+function getRecipes(limit = 50) {
+  return getDb().prepare('SELECT * FROM recipes ORDER BY created_at DESC LIMIT ?').all(limit);
+}
+function addRecipe(item) {
+  getDb()
+    .prepare('INSERT INTO recipes(title, origin, ingredients, steps, source_name, source_url, image_url, is_demo) VALUES (?,?,?,?,?,?,?,?)')
+    .run(item.title, item.origin || null, item.ingredients || null, item.steps || null, item.source_name || null, item.source_url || null, item.image_url || null, item.is_demo ? 1 : 0);
+}
+function updateRecipe(id, fields) {
+  const sets = [];
+  const vals = [];
+  const allowed = ['title', 'origin', 'ingredients', 'steps', 'source_name', 'source_url', 'image_url'];
+  for (const k of allowed) {
+    if (fields[k] !== undefined) {
+      sets.push(`${k} = ?`);
+      vals.push(fields[k]);
+    }
+  }
+  if (!sets.length) return;
+  vals.push(id);
+  getDb().prepare(`UPDATE recipes SET ${sets.join(', ')} WHERE id = ?`).run(...vals);
+}
+function deleteRecipe(id) {
+  getDb().prepare('DELETE FROM recipes WHERE id = ?').run(id);
+}
+
+/* ------------------------------------------------------------------ */
 /* Sesiones                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -853,6 +895,11 @@ module.exports = {
   getAgenda,
   addAgenda,
   deleteAgenda,
+  // recetas
+  getRecipes,
+  addRecipe,
+  updateRecipe,
+  deleteRecipe,
   // sesiones
   createSession,
   getSession,

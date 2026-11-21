@@ -124,6 +124,7 @@ $$('.admin-nav button').forEach((b) => {
         news: loadNews,
         sources: loadSources,
         agenda: loadAgenda,
+        recipes: loadRecipes,
         config: loadConfig,
         history: loadHistory,
         errors: loadErrors
@@ -606,4 +607,43 @@ function fillSectionSelect() {
 }
 
 fillSectionSelect();
-checkSession();
+checkSession();async function loadRecipes() {
+  const items = await api('/api/admin/recipes');
+  $('#recipes-table').innerHTML = items.length
+    ? items.map((r) => `<tr>
+        <td><b>${esc(r.title)}</b></td>
+        <td>${esc(r.origin || '')}</td>
+        <td>${esc(r.source_name || '')}</td>
+        <td><button class="btn-a small" style="background:#b3261e" data-del-rc="${r.id}">Borrar</button></td>
+      </tr>`).join('')
+    : '<tr><td colspan="4">Sin recetas.</td></tr>';
+
+  $('#recipes-table').querySelectorAll('[data-del-rc]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/recipes/' + b.dataset.delRc, 'DELETE');
+        notify('Receta eliminada');
+        await loadRecipes();
+      } catch (e) { notify(e.message, true); }
+    })
+  );
+}
+
+document.getElementById('recipe-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    await api('/api/admin/recipes', 'POST', {
+      title: document.getElementById('rc-title').value.trim(),
+      origin: document.getElementById('rc-origin').value.trim(),
+      ingredients: document.getElementById('rc-ingredients').value.trim(),
+      steps: document.getElementById('rc-steps').value.trim(),
+      source_name: document.getElementById('rc-source').value.trim(),
+      source_url: document.getElementById('rc-url').value.trim()
+    });
+    notify('Receta añadida');
+    document.getElementById('recipe-form').reset();
+    await loadRecipes();
+  } catch (e) { notify(e.message, true); }
+});
+
+

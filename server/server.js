@@ -180,6 +180,9 @@ function serveStatic(req, res, urlPath) {
   if (cleanRel === '/tiempo' || cleanRel === '/tiempo-y-mareas') {
     return serveFile(res, path.join(PUBLIC_DIR, 'tiempo.html'), '.html');
   }
+  if (cleanRel === '/recetas') {
+    return serveFile(res, path.join(PUBLIC_DIR, 'recetas.html'), '.html');
+  }
 
   // Rutas dinámicas amigables: /seccion/xxx -> seccion.html, /noticia/xxx -> noticia.html
   const dynamicMatch = cleanRel.match(/^\/(seccion|noticia)\/(.+)$/);
@@ -333,6 +336,9 @@ async function handleApi(req, res, parsed) {
 
   if (pathname === '/api/agenda' && req.method === 'GET') {
     return sendJson(res, 200, db.getAgenda(Number(q.get('limit') || 8)));
+  }
+  if (pathname === '/api/recipes' && req.method === 'GET') {
+    return sendJson(res, 200, db.getRecipes(Number(q.get('limit') || 50)));
   }
 
   const detailMatch = pathname.match(/^\/api\/news\/([^/]+)$/);
@@ -530,6 +536,27 @@ async function handleAdminApi(req, res, parsed) {
     return sendJson(res, 200, { ok: true });
   }
 
+  // ---- recetas ----
+  if (sub === 'recipes' && method === 'GET') {
+    return sendJson(res, 200, db.getRecipes(Number(q.get('limit') || 50)));
+  }
+  if (sub === 'recipes' && method === 'POST') {
+    const body = await readBody(req);
+    if (!body.title) return sendJson(res, 400, { error: 'Título obligatorio' });
+    db.addRecipe({ ...body, is_demo: 0 });
+    return sendJson(res, 200, { ok: true });
+  }
+  const recipeMatch = sub.match(/^recipes\/(\d+)$/);
+  if (recipeMatch && method === 'PATCH') {
+    const body = await readBody(req);
+    db.updateRecipe(Number(recipeMatch[1]), body);
+    return sendJson(res, 200, { ok: true });
+  }
+  if (recipeMatch && method === 'DELETE') {
+    db.deleteRecipe(Number(recipeMatch[1]));
+    return sendJson(res, 200, { ok: true });
+  }
+
   return sendJson(res, 404, { error: 'Ruta no encontrada' });
 }
 
@@ -560,6 +587,7 @@ function serveSitemap(req, res) {
     { loc: `${origin}/resumen`, priority: '0.7', changefreq: 'daily' },
     { loc: `${origin}/chat`, priority: '0.4', changefreq: 'monthly' },
     { loc: `${origin}/tiempo`, priority: '0.6', changefreq: 'daily' },
+    { loc: `${origin}/recetas`, priority: '0.6', changefreq: 'weekly' },
     { loc: `${origin}/aviso-legal`, priority: '0.2', changefreq: 'monthly' },
     ...rows.map((n) => ({
       loc: `${origin}/noticia/${n.slug}`,

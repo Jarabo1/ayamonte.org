@@ -56,6 +56,7 @@ function renderChrome(activeSlug = '') {
           ${links}
            <a class="nav-link${activeSlug === 'recorrido' ? ' is-active' : ''}" href="/recorrido-3d">Recorrido 3D</a>
            <a class="nav-link${activeSlug === 'tiempo' ? ' is-active' : ''}" href="/tiempo">Tiempo y mareas</a>
+           <a class="nav-link${activeSlug === 'recetas' ? ' is-active' : ''}" href="/recetas">Recetas</a>
            <a class="nav-link${activeSlug === 'chat' ? ' is-active' : ''}" href="/chat">Asistente</a>
            <a class="nav-link${activeSlug === 'resumen' ? ' is-active' : ''}" href="/resumen">En 2 minutos</a>
         </div>
@@ -88,6 +89,7 @@ function renderChrome(activeSlug = '') {
                <li><a href="/chat">Asistente</a></li>
                <li><a href="/recorrido-3d">Recorrido 3D</a></li>
                <li><a href="/tiempo">Tiempo y mareas</a></li>
+               <li><a href="/recetas">Recetas</a></li>
               <li><a href="/privacidad">Política de privacidad</a></li>
               <li><a href="/aviso-legal">Aviso legal</a></li>
               <li><a href="/sitemap.xml">Sitemap</a></li>

@@ -42,6 +42,7 @@
         <li><button data-view="news">📰 Noticias <span class="badge" id="badge-pending">0</span></button></li>
         <li><button data-view="sources">📡 Fuentes RSS</button></li>
         <li><button data-view="agenda">📅 Agenda</button></li>
+<li><button data-view="recipes">🍳 Recetas</button></li>
         <li><button data-view="config">⚙️ Configuración</button></li>
         <li><button data-view="history">🕘 Historial</button></li>
         <li><button data-view="errors">⚠️ Errores <span class="badge" id="badge-errors">0</span></button></li>
@@ -201,6 +202,36 @@
             <table class="data">
               <thead><tr><th>Fecha</th><th>Evento</th><th>Lugar</th><th></th></tr></thead>
               <tbody id="agenda-table"><tr><td colspan="4">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Recetas ---------- -->
+      <section class="view" id="view-recipes">
+        <div class="admin-top">
+          <div><h1>Recetas de la comarca</h1><div class="sub">Platos típicos con elaboración y origen.</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Nueva receta</h2></div>
+          <div class="panel-body">
+            <form id="recipe-form" class="form-row">
+              <div class="field"><label>Título</label><input type="text" id="rc-title" required></div>
+              <div class="field"><label>Origen</label><input type="text" id="rc-origin" placeholder="Ayamonte, Isla Cristina..."></div>
+              <div class="field" style="flex-basis:100%"><label>Ingredientes</label><textarea id="rc-ingredients" rows="3"></textarea></div>
+              <div class="field" style="flex-basis:100%"><label>Elaboración</label><textarea id="rc-steps" rows="5"></textarea></div>
+              <div class="field"><label>Fuente</label><input type="text" id="rc-source" placeholder="Nombre del medio"></div>
+              <div class="field"><label>URL fuente</label><input type="url" id="rc-url"></div>
+              <div class="field" style="justify-content:flex-end"><button class="btn-a accent" type="submit">Añadir</button></div>
+            </form>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Recetas publicadas</h2></div>
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead><tr><th>Título</th><th>Origen</th><th>Fuente</th><th></th></tr></thead>
+              <tbody id="recipes-table"><tr><td colspan="4">Cargando…</td></tr></tbody>
             </table>
           </div>
         </div>
