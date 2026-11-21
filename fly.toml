@@ -1,0 +1,33 @@
+# Fly.io configuration for Ayamonte.org
+app = "ayamonte-org"
+primary_region = "mad"  # Madrid
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+  HOST = "0.0.0.0"
+  DB_PATH = "data/ayamonte.db"
+  PUBLICATION_MODE = "auto"
+  AUTO_COLLECT_MINUTES = "30"
+  SITE_NAME = "Ayamonte.org"
+  SEARCH_PROVIDER = "none"
+  AI_PROVIDER = "none"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[mounts]]
+  source = "data_vol"
+  destination = "/app/data"
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
