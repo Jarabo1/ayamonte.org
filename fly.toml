@@ -1,9 +1,12 @@
 # Fly.io configuration for Ayamonte.org
 app = "ayamonte-org"
-primary_region = "mad"  # Madrid
+primary_region = "cdg"  # Paris (closest to Spain)
 
 [build]
-  builder = "heroku/buildpacks:20"
+  builder = "heroku/builder:22"
+
+[processes]
+  web = "node server/server.js"
 
 [env]
   NODE_ENV = "production"
