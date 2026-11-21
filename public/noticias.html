@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c92a2a">
+  <meta property="og:image" content="/assets/icons/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>Noticias y archivo — Ayamonte.org</title>
+  <meta name="description" content="Buscador y archivo histórico de noticias de Ayamonte y su comarca. Filtra por palabra clave, sección y fecha.">
+  <link rel="canonical" href="/noticias">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Noticias y archivo — Ayamonte.org">
+  <meta property="og:description" content="Buscador y archivo histórico de noticias de Ayamonte.">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css?v=10">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body data-page="noticias">
+
+  <header class="topbar" id="topbar"></header>
+
+  <div class="masthead">
+    <div class="container masthead-inner">
+      <a href="/" aria-label="Ayamonte.org — Portada">
+        <span class="logo">Ayamonte<span class="logo-accent">.org</span></span>
+        <span class="logo-sub">Periódico digital · Huelva</span>
+      </a>
+    </div>
+  </div>
+
+  <nav class="mainnav" id="mainnav" aria-label="Secciones"></nav>
+
+  <main>
+    <div class="container">
+      <div class="page-head">
+        <div class="breadcrumbs"><a href="/">Portada</a> / Noticias y archivo</div>
+        <h1 id="page-title">Todas las noticias</h1>
+        <p id="page-desc">Busca por palabra clave, filtra por sección y fecha, y consulta el archivo histórico del periódico.</p>
+      </div>
+
+      <!-- Filtros -->
+      <form class="filters" id="filters" role="search">
+        <div class="search-box">
+          <input type="search" id="f-q" name="q" placeholder="Buscar por palabra clave…" aria-label="Palabra clave">
+          <button type="submit">Buscar</button>
+        </div>
+        <div class="row-inline" style="display:flex;gap:.7rem;flex-wrap:wrap;align-items:center">
+          <label for="f-section">Sección
+            <select id="f-section" name="section">
+              <option value="">Todas</option>
+            </select>
+          </label>
+          <label for="f-from">Desde
+            <input type="date" id="f-from" name="from">
+          </label>
+          <label for="f-to">Hasta
+            <input type="date" id="f-to" name="to">
+          </label>
+          <label for="f-sort">Orden
+            <select id="f-sort" name="sort">
+              <option value="published">Más recientes</option>
+              <option value="views">Más leídas</option>
+              <option value="fetched">Últimas incorporadas</option>
+            </select>
+          </label>
+          <button type="button" class="btn ghost" id="f-reset">Limpiar</button>
+        </div>
+      </form>
+
+      <div id="results" aria-live="polite"></div>
+      <nav class="pagination" id="pagination" aria-label="Paginación"></nav>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/main.js?v=7"></script>
+  <script src="/js/noticias.js"></script>
+</body>
+</html>

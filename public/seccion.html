@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c92a2a">
+  <meta property="og:image" content="/assets/icons/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>Sección — Ayamonte.org</title>
+  <meta name="description" content="Noticias por sección de Ayamonte.org.">
+  <meta name="robots" content="index, follow">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css?v=10">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body data-page="seccion" data-section="">
+
+  <header class="topbar" id="topbar"></header>
+
+  <div class="masthead">
+    <div class="container masthead-inner">
+      <a href="/" aria-label="Ayamonte.org — Portada">
+        <span class="logo">Ayamonte<span class="logo-accent">.org</span></span>
+        <span class="logo-sub">Periódico digital · Huelva</span>
+      </a>
+    </div>
+  </div>
+
+  <nav class="mainnav" id="mainnav" aria-label="Secciones"></nav>
+
+  <main>
+    <div class="container">
+      <div class="page-head">
+        <div class="breadcrumbs"><a href="/">Portada</a> / <span id="crumb">Sección</span></div>
+        <h1 id="section-title">Sección</h1>
+        <p id="section-desc"></p>
+      </div>
+
+      <div class="filters">
+        <form class="search-box" id="section-search" role="search" style="max-width:420px">
+          <input type="search" id="s-q" placeholder="Buscar en esta sección…" aria-label="Buscar en la sección">
+          <button type="submit">Buscar</button>
+        </form>
+        <div class="row-inline" style="display:flex;gap:.7rem;align-items:center;margin-left:auto">
+          <label for="s-sort" style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#666">Orden
+            <select id="s-sort">
+              <option value="published">Más recientes</option>
+              <option value="views">Más leídas</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="results" aria-live="polite"></div>
+      <nav class="pagination" id="pagination" aria-label="Paginación"></nav>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/main.js?v=7"></script>
+  <script src="/js/secciones.js"></script>
+</body>
+</html>

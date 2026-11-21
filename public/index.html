@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c92a2a">
+  <meta property="og:image" content="/assets/icons/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>Ayamonte.org — Periódico digital de Ayamonte (Huelva)</title>
+  <meta name="description" content="Noticias de Ayamonte y su comarca. Información local actualizada de Ayamonte.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ayamonte.org">
+  <meta property="og:title" content="Ayamonte.org — Periódico digital de Ayamonte">
+  <meta property="og:description" content="Noticias de Ayamonte y su comarca con recopilación y clasificación automatizada.">
+  <meta property="og:locale" content="es_ES">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="alternate" type="application/rss+xml" title="Ayamonte.org" href="/api/news?per=20">
+  <link rel="stylesheet" href="/css/styles.css?v=10">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    "name": "Ayamonte.org",
+    "description": "Periódico digital de Ayamonte (Huelva)",
+    "areaServed": "Ayamonte, Huelva, España"
+  }
+  </script>
+</head>
+<body data-page="home">
+
+  <header class="topbar" id="topbar"></header>
+
+  <div class="masthead">
+    <div class="container masthead-inner">
+      <div class="masthead-side left">Información local<br>de Ayamonte y su comarca</div>
+      <a href="/" aria-label="Ayamonte.org — Portada">
+        <span class="logo">Ayamonte<span class="logo-accent">.org</span></span>
+        <span class="logo-sub">Periódico digital · Huelva</span>
+      </a>
+      <div class="masthead-side right">Actualización<br>automatizada con IA</div>
+    </div>
+  </div>
+
+  <nav class="mainnav" id="mainnav" aria-label="Secciones"></nav>
+
+  <main>
+    <div class="container">
+
+      <!-- Hero principal -->
+      <section class="hero" id="hero" aria-label="Noticias destacadas"></section>
+
+      <!-- Última hora -->
+      <div class="ultima-hora" role="marquee" aria-label="Última hora">
+        <span class="label">Última hora</span>
+        <div class="ticker"><div class="ticker-track" id="ticker-track"></div></div>
+      </div>
+
+      <div class="layout">
+        <div class="content">
+          <!-- Últimas noticias -->
+          <section class="block" id="latest-block" aria-label="Últimas noticias"></section>
+
+          <!-- Actualidad local -->
+          <section class="block" id="local-block" aria-label="Actualidad local"></section>
+
+          <!-- Secciones temáticas -->
+          <div id="sections-block"></div>
+        </div>
+
+        <aside class="sidebar">
+          <section class="side-block" aria-label="Buscador">
+            <h2>Buscar noticias</h2>
+            <form class="search-box" action="/noticias" method="get" role="search">
+              <input type="search" name="q" placeholder="Palabra clave…" aria-label="Buscar noticias" required>
+              <button type="submit">Buscar</button>
+            </form>
+          </section>
+
+          <section class="side-block" aria-label="Más leídas">
+            <h2>Más leídas</h2>
+            <ol class="popular-list" id="popular-list"></ol>
+          </section>
+
+          <section class="side-block" aria-label="Agenda">
+            <h2>Agenda</h2>
+            <ul class="agenda-list" id="agenda-list"></ul>
+          </section>
+
+          <section class="side-block" aria-label="Archivo">
+            <h2>Archivo</h2>
+            <p style="font-size:.87rem;color:#666;line-height:1.6;margin-top:0">
+              Consulta noticias anteriores por fecha, sección o palabra clave.
+            </p>
+            <a class="btn ghost" href="/noticias" style="display:inline-block">Acceder al archivo</a>
+          </section>
+        </aside>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/main.js?v=7"></script>
+</body>
+</html>

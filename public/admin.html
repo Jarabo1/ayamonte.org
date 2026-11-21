@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#c92a2a">
+  <meta property="og:image" content="/assets/icons/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>Administración — Ayamonte.org</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin">
+
+  <!-- ============ LOGIN ============ -->
+  <div class="login-wrap" id="login-wrap">
+    <form class="login-card" id="login-form" autocomplete="on">
+      <h1>Ayamonte.org</h1>
+      <div class="sub">Panel de administración</div>
+      <label for="username">Usuario</label>
+      <input type="text" id="username" name="username" autocomplete="username" required>
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+      <div class="login-error" id="login-error"></div>
+      <button type="submit" id="login-btn">Entrar</button>
+      <p class="login-hint">
+        Configura <b>ADMIN_USER</b> y <b>ADMIN_PASSWORD</b> en el archivo <b>.env</b>.
+        Las claves API se guardan solo en el servidor, nunca en el navegador.
+      </p>
+    </form>
+  </div>
+
+  <!-- ============ PANEL ============ -->
+  <div class="admin-shell" id="admin-shell">
+    <aside class="admin-side">
+      <div class="admin-brand">Ayamonte.org<span>Administración</span></div>
+      <ul class="admin-nav">
+        <li><button class="active" data-view="dashboard">◉ Resumen</button></li>
+        <li><button data-view="news">📰 Noticias <span class="badge" id="badge-pending">0</span></button></li>
+        <li><button data-view="sources">📡 Fuentes RSS</button></li>
+        <li><button data-view="agenda">📅 Agenda</button></li>
+        <li><button data-view="config">⚙️ Configuración</button></li>
+        <li><button data-view="history">🕘 Historial</button></li>
+        <li><button data-view="errors">⚠️ Errores <span class="badge" id="badge-errors">0</span></button></li>
+      </ul>
+      <button class="logout" id="logout-btn">Cerrar sesión</button>
+    </aside>
+
+    <div class="admin-main">
+
+      <!-- ---------- Resumen ---------- -->
+      <section class="view active" id="view-dashboard">
+        <div class="admin-top">
+          <div>
+            <h1>Resumen</h1>
+            <div class="sub" id="dash-updated">Estado del sistema</div>
+          </div>
+          <div class="toolbar">
+            <input type="search" id="manual-query" placeholder="Consulta temática (opcional)…">
+            <button class="btn-a accent" id="run-collect">▶ Ejecutar búsqueda ahora</button>
+          </div>
+        </div>
+
+        <div class="note warn" id="collect-note" hidden>
+          Búsqueda en curso… esto puede tardar unos segundos según las fuentes configuradas.
+        </div>
+
+        <div class="stat-grid" id="stat-grid"></div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Fuentes de información</h2><span class="pill info" id="src-summary">—</span></div>
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead><tr><th>Fuente</th><th>Tipo</th><th>Estado</th><th>Última ejecución</th><th>Error</th></tr></thead>
+              <tbody id="sources-status"><tr><td colspan="5">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Últimas noticias incorporadas</h2>
+            <a class="btn-a ghost small" href="/noticias" target="_blank">Ver portada ↗</a>
+          </div>
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead><tr><th>Titular</th><th>Sección</th><th>Estado</th><th>Origen</th><th></th></tr></thead>
+              <tbody id="recent-news"><tr><td colspan="5">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Noticias ---------- -->
+      <section class="view" id="view-news">
+        <div class="admin-top">
+          <div>
+            <h1>Gestión de noticias</h1>
+            <div class="sub">Aprueba, edita, clasifica o elimina las noticias recopiladas.</div>
+          </div>
+          <div class="toolbar">
+            <select id="news-status">
+              <option value="pending">Pendientes</option>
+              <option value="approved">Aprobadas</option>
+              <option value="rejected">Rechazadas</option>
+              <option value="all">Todas</option>
+            </select>
+            <select id="news-section"><option value="">Todas las secciones</option></select>
+            <input type="search" id="news-q" placeholder="Buscar…">
+            <button class="btn-a" id="news-search">Filtrar</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Titular</th><th>Sección</th><th>Estado</th><th>Fecha</th><th>Origen</th><th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="news-table"><tr><td colspan="6">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="panel-head" style="border-top:1px solid var(--adm-line);border-bottom:0">
+            <button class="btn-a ghost small" id="news-prev">‹ Anterior</button>
+            <span id="news-page-info" class="sub">—</span>
+            <button class="btn-a ghost small" id="news-next">Siguiente ›</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Fuentes ---------- -->
+      <section class="view" id="view-sources">
+        <div class="admin-top">
+          <div>
+            <h1>Fuentes RSS / Atom</h1>
+            <div class="sub">Añade, edita o desactiva medios y webs institucionales.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Añadir fuente</h2></div>
+          <div class="panel-body">
+            <form id="source-form" class="form-row">
+              <div class="field"><label>Nombre del medio</label><input type="text" id="src-name" required placeholder="Ej. Diario de Huelva"></div>
+              <div class="field"><label>URL del feed (RSS/Atom)</label><input type="url" id="src-url" required placeholder="https://…/feed/"></div>
+              <div class="field"><label>Tipo</label>
+                <select id="src-type"><option value="rss">RSS</option><option value="atom">Atom</option></select>
+              </div>
+              <div class="field"><label>Categoría</label>
+                <select id="src-kind">
+                  <option value="provincial">Provincial</option>
+                  <option value="regional">Regional</option>
+                  <option value="nacional">Nacional</option>
+                  <option value="institucional">Institucional</option>
+                  <option value="agencia">Agencia</option>
+                </select>
+              </div>
+              <div class="field" style="justify-content:flex-end">
+                <button class="btn-a accent" type="submit">Añadir fuente</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Fuentes configuradas</h2></div>
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead><tr><th>Nombre</th><th>URL</th><th>Tipo</th><th>Activa</th><th>Último estado</th><th></th></tr></thead>
+              <tbody id="sources-table"><tr><td colspan="6">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Agenda ---------- -->
+      <section class="view" id="view-agenda">
+        <div class="admin-top">
+          <div><h1>Agenda de acontecimientos</h1><div class="sub">Eventos que se muestran en la portada.</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Nuevo evento</h2></div>
+          <div class="panel-body">
+            <form id="agenda-form" class="form-row">
+              <div class="field"><label>Título</label><input type="text" id="ag-title" required></div>
+              <div class="field"><label>Fecha</label><input type="date" id="ag-date" required></div>
+              <div class="field"><label>Hora</label><input type="time" id="ag-time"></div>
+              <div class="field"><label>Lugar</label><input type="text" id="ag-loc"></div>
+              <div class="field" style="justify-content:flex-end"><button class="btn-a accent" type="submit">Añadir</button></div>
+            </form>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Eventos programados</h2></div>
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead><tr><th>Fecha</th><th>Evento</th><th>Lugar</th><th></th></tr></thead>
+              <tbody id="agenda-table"><tr><td colspan="4">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Configuración ---------- -->
+      <section class="view" id="view-config">
+        <div class="admin-top">
+          <div><h1>Configuración</h1><div class="sub">Frecuencia, publicación e integraciones.</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Publicación y búsqueda</h2></div>
+          <div class="panel-body">
+            <form id="config-form">
+              <div class="form-row">
+                <div class="field">
+                  <label>Modo de publicación</label>
+                  <select id="cfg-mode">
+                    <option value="manual">Previa aprobación (recomendado)</option>
+                    <option value="auto">Automática (publica sin revisión)</option>
+                  </select>
+                  <span class="hint">Por defecto: publicación previa aprobación del administrador.</span>
+                </div>
+                <div class="field">
+                  <label>Frecuencia de búsqueda automática (minutos)</label>
+                  <input type="number" id="cfg-minutes" min="0" max="1440" step="1">
+                  <span class="hint">0 desactiva la búsqueda automática.</span>
+                </div>
+                <div class="field">
+                  <label>Modo demostración</label>
+                  <select id="cfg-demo">
+                    <option value="1">Activo (muestra aviso)</option>
+                    <option value="0">Desactivado</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label>Búsquedas temáticas (separadas por coma)</label>
+                <textarea id="cfg-queries" rows="3"></textarea>
+                <span class="hint">Se usan cuando hay proveedor de búsqueda web configurado.</span>
+              </div>
+              <button class="btn-a accent" type="submit">Guardar configuración</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Integraciones (variables de entorno)</h2></div>
+          <div class="panel-body">
+            <div class="note">
+              Las claves API se leen del archivo <b>.env</b> en el servidor y
+              <b>nunca se envían al navegador</b>. Edita el archivo y reinicia el servicio para cambiarlas.
+            </div>
+            <div class="table-wrap">
+              <table class="data">
+                <thead><tr><th>Servicio</th><th>Proveedor</th><th>Configurado</th></tr></thead>
+                <tbody id="integrations-table"></tbody>
+              </table>
+            </div>
+            <p class="sub" style="margin-top:.8rem">
+              Sin proveedor de IA, el sistema aplica un procesador local por reglas (clasificación,
+              relevancia y resumen extractivo sin inventar contenido). Sin proveedor de búsqueda,
+              solo se utilizan las fuentes RSS/Atom.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Historial ---------- -->
+      <section class="view" id="view-history">
+        <div class="admin-top">
+          <div><h1>Historial de búsquedas</h1><div class="sub">Registro de cada ronda de recopilación.</div></div>
+          <button class="btn-a ghost" id="refresh-history">Actualizar</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead>
+                <tr><th>#</th><th>Inicio</th><th>Fin</th><th>Tipo</th><th>Fuentes</th><th>Encontradas</th><th>Nuevas</th><th>Duplicadas</th><th>Descartadas</th><th>Estado</th><th>Mensaje</th></tr>
+              </thead>
+              <tbody id="history-table"><tr><td colspan="11">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Errores ---------- -->
+      <section class="view" id="view-errors">
+        <div class="admin-top">
+          <div><h1>Registro de errores</h1><div class="sub">Fallos de fuentes, IA y sistema.</div></div>
+          <button class="btn-a ghost" id="refresh-errors">Actualizar</button>
+        </div>
+        <div class="panel">
+          <div class="panel-body" id="errors-list"><div class="sub">Cargando…</div></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ============ EDITOR ============ -->
+  <div class="login-wrap" id="editor-wrap" style="display:none;z-index:50">
+    <form class="login-card" id="editor-form" style="width:min(100%,640px)">
+      <h1>Editar noticia</h1>
+      <div class="sub" id="editor-sub"></div>
+      <input type="hidden" id="ed-id">
+      <div class="field"><label>Titular</label><input type="text" id="ed-title" required maxlength="220"></div>
+      <div class="field"><label>Titular alternativo (opcional)</label><input type="text" id="ed-alt" maxlength="160"></div>
+      <div class="field"><label>Resumen</label><textarea id="ed-summary" rows="4" maxlength="600"></textarea></div>
+      <div class="form-row">
+        <div class="field"><label>Sección principal</label><select id="ed-section"></select></div>
+        <div class="field"><label>Estado</label>
+          <select id="ed-status">
+            <option value="pending">Pendiente</option>
+            <option value="approved">Aprobada</option>
+            <option value="rejected">Rechazada</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Etiquetas (separadas por coma)</label><input type="text" id="ed-tags"></div>
+      <label class="check-line"><input type="checkbox" id="ed-featured"> Destacada en portada</label>
+      <div style="display:flex;gap:.6rem;margin-top:1.1rem">
+        <button class="btn-a accent" type="submit">Guardar cambios</button>
+        <button class="btn-a ghost" type="button" id="editor-cancel">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

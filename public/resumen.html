@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c92a2a">
+  <meta property="og:image" content="/assets/icons/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>En 2 minutos — Ayamonte.org</title>
+  <meta name="description" content="Resumen del día con las noticias clave de Ayamonte y su comarca.">
+  <link rel="canonical" href="/resumen">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="En 2 minutos — Ayamonte.org">
+  <meta property="og:description" content="Resumen del día con las noticias clave de Ayamonte.">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css?v=10">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body data-page="resumen" data-section="resumen">
+
+  <header class="topbar" id="topbar"></header>
+
+  <div class="masthead">
+    <div class="container masthead-inner">
+      <a href="/" aria-label="Ayamonte.org — Portada">
+        <span class="logo">Ayamonte<span class="logo-accent">.org</span></span>
+        <span class="logo-sub">Periódico digital · Huelva</span>
+      </a>
+    </div>
+  </div>
+
+  <nav class="mainnav" id="mainnav" aria-label="Secciones"></nav>
+
+  <main>
+    <div class="container">
+      <div class="page-head">
+        <div class="breadcrumbs"><a href="/">Portada</a> / En 2 minutos</div>
+        <h1>En 2 minutos</h1>
+        <p>Resumen del día con las noticias clave de Ayamonte y su comarca. Actualizado automáticamente.</p>
+      </div>
+
+      <section class="block" id="briefing" aria-label="Resumen del día">
+        <div class="block-head">
+          <h2>Noticias clave de hoy</h2>
+        </div>
+        <div id="briefing-list">Cargando…</div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/api.js?v=2"></script>
+  <script src="/js/main.js?v=7"></script>
+  <script>
+    (function () {
+      const today = new Date().toISOString().slice(0, 10);
+      API.get('/api/latest?limit=12').then((items) => {
+        const list = (items || []).filter((n) => (n.publishedAt || n.fetchedAt || '').slice(0, 10) === today);
+        const root = document.getElementById('briefing-list');
+        if (!list.length) {
+          root.innerHTML = '<div class="empty is-visible">Aún no hay noticias publicadas hoy. Vuelve más tarde.</div>';
+          return;
+        }
+        root.innerHTML = '<div class="card-list">' + list.map((n) => `
+          <article class="row">
+            <div>
+              <a href="${newsHref(n)}" style="font-weight:700">${esc(n.title)}</a>
+              <div class="meta"><span>${esc(sectionName(n.section))}</span><span class="dot">${esc(n.source || '')}</span></div>
+              <p style="margin:.4rem 0 0;color:var(--ink-soft);font-size:.92rem;line-height:1.55">${esc((n.summary || '').slice(0, 220))}${n.summary && n.summary.length > 220 ? '…' : ''}</p>
+            </div>
+          </article>
+        `).join('') + '</div>';
+      }).catch((err) => {
+        document.getElementById('briefing-list').innerHTML = '<div class="empty is-visible">Error al cargar: ' + esc(err.message) + '</div>';
+      });
+    })();
+  </script>
+</body>
+</html>

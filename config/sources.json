@@ -1,0 +1,119 @@
+{
+  "$comment": "Fuentes de información de Ayamonte.org. Centrado principalmente en Ayamonte y su comarca.",
+  "sections": [
+    { "slug": "ayamonte", "name": "Noticias de Ayamonte" },
+    { "slug": "comarca", "name": "Noticias comarcales" }
+  ],
+  "sources": [
+    {
+      "name": "Ayuntamiento de Ayamonte",
+      "url": "https://www.ayamonte.es/rss",
+      "type": "rss",
+      "kind": "institucional",
+      "enabled": true
+    },
+    {
+      "name": "Huelva Hoy",
+      "url": "https://www.huelvahoy.es/feed/",
+      "type": "rss",
+      "kind": "provincial",
+      "enabled": true
+    },
+    {
+      "name": "Diario de Huelva",
+      "url": "https://www.diariodehuelva.es/feed/",
+      "type": "rss",
+      "kind": "provincial",
+      "enabled": true
+    },
+    {
+      "name": "Huelva Información",
+      "url": "https://www.huelvainformacion.es/rss",
+      "type": "rss",
+      "kind": "provincial",
+      "enabled": true
+    },
+    {
+      "name": "Oncuba News",
+      "url": "https://www.oncubanews.com/feed/",
+      "type": "rss",
+      "kind": "regional",
+      "enabled": true
+    },
+    {
+      "name": "El Día de Córdoba",
+      "url": "https://www.eldiadecordoba.es/rss",
+      "type": "rss",
+      "kind": "regional",
+      "enabled": true
+    },
+    {
+      "name": "Junta de Andalucía (noticias)",
+      "url": "https://www.juntadeandalucia.es/ssdigitales/datasets/contentapi/1.0.0/search/noticia.atom?_source=data&size=50&from=0&sort=date:desc",
+      "type": "atom",
+      "kind": "institucional",
+      "enabled": true
+    },
+    {
+      "name": "El País (portada)",
+      "url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+      "type": "rss",
+      "kind": "nacional",
+      "enabled": true
+    },
+    {
+      "name": "Huelva24",
+      "url": "https://www.huelva24.com/rss/2.0/portada/",
+      "type": "rss",
+      "kind": "provincial",
+      "enabled": true
+    },
+    {
+      "name": "Tinto Noticias",
+      "url": "https://www.tintonoticias.com/feed/",
+      "type": "rss",
+      "kind": "provincial",
+      "enabled": true
+    },
+    {
+      "name": "Huelva Buenas Noticias",
+      "url": "https://www.huelvabuenasnoticias.com/feed/",
+      "type": "rss",
+      "kind": "provincial",
+      "enabled": true
+    },
+    {
+      "name": "Newtral",
+      "url": "https://www.newtral.es/feed/",
+      "type": "rss",
+      "kind": "nacional",
+      "enabled": false
+    }
+  ],
+  "searchQueries": [
+    "Ayamonte",
+    "Ayamonte Huelva",
+    "Ayuntamiento de Ayamonte",
+    "Ayamonte actualidad noticias",
+    "Isla Canela Ayamonte",
+    "Punta del Moral Ayamonte",
+    "Ayamonte cultura sucesos deportes",
+    "Comarca Ayamonte Isla Cristina Lepe"
+  ],
+  "nearbyPlaces": [
+    "Ayamonte",
+    "Isla Cristina",
+    "Lepe",
+    "Villablanca",
+    "Cartaya",
+    "Villanueva de los Castillejos",
+    "El Rompido",
+    "Punta Umbría",
+    "Sanlúcar de Guadiana",
+    "El Granado",
+    "San Silvestre de Guadiana",
+    "Aljaraque",
+    "Huelva"
+  ],
+  "demoMode": false
+}

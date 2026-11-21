@@ -1,0 +1,19 @@
+{
+  "name": "ayamonte-org",
+  "version": "1.0.0",
+  "description": "Periódico digital Ayamonte.org con recopilación y clasificación automatizada de noticias",
+  "private": true,
+  "type": "commonjs",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "collect": "node server/newsCollector.js --once",
+    "init-db": "node server/database.js --init"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {},
+  "optionalDependencies": {}
+}

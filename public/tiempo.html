@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c92a2a">
+  <meta property="og:image" content="/assets/icons/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>Tiempo y mareas — Ayamonte.org</title>
+  <meta name="description" content="Previsión del tiempo y mareas en Ayamonte.">
+  <link rel="canonical" href="/tiempo">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css?v=10">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .weather-card { background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; }
+    .weather-now { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .weather-now .temp { font-family: var(--serif); font-size: 3rem; font-weight: 900; color: var(--accent); }
+    .weather-now .desc { font-size: 1rem; color: var(--ink-soft); }
+    .weather-days { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: .6rem; }
+    .weather-day { text-align: center; padding: .6rem; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; }
+    .weather-day .d { font-size: .75rem; color: var(--ink-mute); }
+    .weather-day .t { font-weight: 700; }
+    .tides-box { margin-top: 2rem; padding: 1.5rem; background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); }
+  </style>
+</head>
+<body data-page="tiempo" data-section="tiempo">
+
+  <header class="topbar" id="topbar"></header>
+  <div class="masthead">
+    <div class="container masthead-inner">
+      <a href="/" aria-label="Ayamonte.org — Portada">
+        <span class="logo">Ayamonte<span class="logo-accent">.org</span></span>
+        <span class="logo-sub">Periódico digital · Huelva</span>
+      </a>
+    </div>
+  </div>
+  <nav class="mainnav" id="mainnav" aria-label="Secciones"></nav>
+
+  <main>
+    <div class="container">
+      <div class="page-head">
+        <div class="breadcrumbs"><a href="/">Portada</a> / Tiempo y mareas</div>
+        <h1>Tiempo y mareas en Ayamonte</h1>
+        <p>Previsión meteorológica y enlaces a las mareas de la zona.</p>
+      </div>
+
+      <section class="weather-card" aria-label="Previsión del tiempo">
+        <div id="weather-now" class="weather-now">Cargando tiempo…</div>
+        <div id="weather-days" class="weather-days"></div>
+      </section>
+
+      <section class="tides-box" aria-label="Mareas">
+        <h2>Mareas en Ayamonte</h2>
+        <p>Pleamares y bajamares próximas (Isla Canela / Ayamonte).</p>
+        <div id="tides-list">Cargando mareas…</div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/api.js?v=7"></script>
+  <script src="/js/main.js?v=7"></script>
+  <script>
+    (function () {
+      const WMO = {
+        0: 'Despejado', 1: 'Casi despejado', 2: 'Parcialmente nublado', 3: 'Nublado',
+        45: 'Niebla', 48: 'Niebla con escarcha', 51: 'Llovizna ligera', 53: 'Llovizna moderada',
+        55: 'Llovizna intensa', 61: 'Lluvia ligera', 63: 'Lluvia moderada', 65: 'Lluvia intensa',
+        71: 'Nieve ligera', 73: 'Nieve moderada', 75: 'Nieve intensa', 80: 'Chubascos ligeros',
+        81: 'Chubascos moderados', 82: 'Chubascos intensos', 95: 'Tormenta', 96: 'Tormenta con granizo',
+        99: 'Tormenta fuerte con granizo'
+      };
+      const url = 'https://api.open-meteo.com/v1/forecast?latitude=37.22&longitude=-7.41&current=temperature_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe/Madrid';
+      fetch(url).then((r) => r.json()).then((d) => {
+        const c = d.current;
+        document.getElementById('weather-now').innerHTML =
+          '<div class="temp">' + Math.round(c.temperature_2m) + '°C</div>' +
+          '<div class="desc">' + (WMO[c.weather_code] || 'Tiempo') + ' · Viento ' + Math.round(c.wind_speed_10m) + ' km/h</div>';
+        const days = d.daily.time.map((t, i) => {
+          const dt = new Date(t + 'T00:00:00');
+          const label = dt.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
+          return '<div class="weather-day"><div class="d">' + label + '</div><div class="t">' + Math.round(d.daily.temperature_2m_max[i]) + '° / ' + Math.round(d.daily.temperature_2m_min[i]) + '°</div><div style="font-size:.7rem;color:var(--ink-mute)">' + (WMO[d.daily.weather_code[i]] || '') + '</div></div>';
+        }).join('');
+        document.getElementById('weather-days').innerHTML = days;
+      }).catch((e) => {
+        document.getElementById('weather-now').textContent = 'No se pudo cargar el tiempo: ' + e.message;
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      const key = '0385707f-da11-4e4b-846a-9cd8064221ee';
+      const now = Math.floor(Date.now() / 1000);
+      const url = 'https://www.worldtides.info/api/v3?extremes&lat=37.22&lon=-7.41&start=' + now + '&length=172800&key=' + key;
+      fetch(url).then((r) => r.json()).then((d) => {
+        const list = d.extremes || [];
+        if (!list.length) { document.getElementById('tides-list').textContent = 'Sin datos de mareas.'; return; }
+        const rows = list.map((e) => {
+          const dt = new Date(e.dt * 1000);
+          const label = dt.toLocaleString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+          const type = e.type === 'High' ? 'Pleamar' : 'Bajamar';
+          const color = e.type === 'High' ? 'var(--accent)' : 'var(--ink-mute)';
+          return '<tr><td style="padding:.4rem .6rem">' + label + '</td><td style="padding:.4rem .6rem;color:' + color + ';font-weight:700">' + type + '</td><td style="padding:.4rem .6rem">' + e.height.toFixed(2) + ' m</td></tr>';
+        }).join('');
+        document.getElementById('tides-list').innerHTML = '<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--line)">Fecha/hora</th><th style="text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--line)">Tipo</th><th style="text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--line)">Altura</th></tr></thead><tbody>' + rows + '</tbody></table>';
+      }).catch((e) => {
+        document.getElementById('tides-list').textContent = 'No se pudo cargar las mareas: ' + e.message;
+      });
+    })();
+  </script>
+</body>
+</html>

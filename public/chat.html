@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c92a2a">
+  <meta property="og:image" content="/assets/icons/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>Asistente de noticias — Ayamonte.org</title>
+  <meta name="description" content="Chatbot para consultar las noticias de Ayamonte.">
+  <link rel="canonical" href="/chat">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css?v=10">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .chat-wrap { max-width: 720px; margin: 0 auto; }
+    .chat-log { background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; min-height: 320px; max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: .75rem; }
+    .chat-msg { max-width: 85%; padding: .6rem .85rem; border-radius: 10px; line-height: 1.5; font-size: .95rem; }
+    .chat-msg.user { align-self: flex-end; background: var(--accent); color: #fff; }
+    .chat-msg.bot { align-self: flex-start; background: var(--paper); border: 1px solid var(--line); }
+    .chat-msg.bot a { color: var(--accent); font-weight: 600; }
+    .chat-input-row { display: flex; gap: .5rem; margin-top: 1rem; }
+    .chat-input-row input { flex: 1; padding: .6rem .8rem; border: 1px solid var(--line); border-radius: var(--radius); font-size: 1rem; }
+    .chat-input-row button { padding: .6rem 1.2rem; }
+    .chat-hint { font-size: .8rem; color: var(--ink-mute); margin-top: .5rem; }
+  </style>
+</head>
+<body data-page="chat" data-section="chat">
+
+  <header class="topbar" id="topbar"></header>
+  <div class="masthead">
+    <div class="container masthead-inner">
+      <a href="/" aria-label="Ayamonte.org — Portada">
+        <span class="logo">Ayamonte<span class="logo-accent">.org</span></span>
+        <span class="logo-sub">Periódico digital · Huelva</span>
+      </a>
+    </div>
+  </div>
+  <nav class="mainnav" id="mainnav" aria-label="Secciones"></nav>
+
+  <main>
+    <div class="container">
+      <div class="page-head">
+        <div class="breadcrumbs"><a href="/">Portada</a> / Asistente</div>
+        <h1>Asistente de noticias</h1>
+        <p>Pregúntame sobre las noticias de Ayamonte y su comarca. Busco en el archivo y te respondo.</p>
+      </div>
+
+      <div class="chat-wrap">
+        <div class="chat-log" id="chat-log">
+          <div class="chat-msg bot">Hola. Pregúntame algo como “noticias de Ayamonte hoy” o “qué pasó en la autovía A-49”.</div>
+        </div>
+        <form class="chat-input-row" id="chat-form">
+          <input type="text" id="chat-input" placeholder="Escribe tu pregunta…" required autocomplete="off">
+          <button type="submit">Enviar</button>
+          <button type="button" id="chat-clear">Limpiar</button>
+        </form>
+        <div class="chat-hint">El asistente busca en las noticias publicadas y muestra las más relevantes.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="site-footer"></footer>
+
+  <script src="/js/api.js?v=3"></script>
+  <script src="/js/main.js?v=7"></script>
+  <script>
+    (function () {
+      const log = document.getElementById('chat-log');
+      const form = document.getElementById('chat-form');
+      const input = document.getElementById('chat-input');
+
+      function addMsg(text, role) {
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + role;
+        div.innerHTML = text;
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+      async function respond(q) {
+        addMsg(esc(q), 'user');
+        const typing = document.createElement('div');
+        typing.className = 'chat-msg bot';
+        typing.textContent = 'Buscando…';
+        log.appendChild(typing);
+        log.scrollTop = log.scrollHeight;
+        try {
+          const lower = q.toLowerCase();
+          const wantsToday = /hoy|today/.test(lower);
+          const wantsLatest = /últim|recient|latest|recientes/.test(lower);
+          let items = [];
+          if (wantsToday || wantsLatest) {
+            const latest = await API.get('/api/latest?limit=12');
+            const arr = Array.isArray(latest) ? latest : (latest.items || []);
+            if (wantsToday) {
+              const today = new Date().toISOString().slice(0, 10);
+              items = arr.filter((n) => (n.publishedAt || n.fetchedAt || '').slice(0, 10) === today);
+            } else {
+              items = arr;
+            }
+          } else {
+            const data = await API.get('/api/search?q=' + encodeURIComponent(q));
+            items = (data.items || data || []);
+          }
+          items = items.slice(0, 6);
+          typing.remove();
+          if (!items.length) {
+            addMsg('No he encontrado noticias relacionadas. Prueba con otras palabras clave.', 'bot');
+            return;
+          }
+          const html = 'He encontrado estas noticias:<br><br>' + items.map((n) =>
+            `• <a href="${newsHref(n)}">${esc(n.title)}</a><br><span style="font-size:.85rem;color:var(--ink-mute)">${esc((n.summary || '').slice(0, 120))}</span>`
+          ).join('<br><br>');
+          addMsg(html, 'bot');
+        } catch (err) {
+          typing.remove();
+          addMsg('Error al buscar: ' + esc(err.message), 'bot');
+        }
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const q = input.value.trim();
+        if (!q) return;
+        input.value = '';
+        respond(q);
+      });
+
+      document.getElementById('chat-clear').addEventListener('click', () => {
+        log.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = 'chat-msg bot';
+        div.textContent = 'Chat limpiado. Pregúntame de nuevo.';
+        log.appendChild(div);
+      });
+    })();
+  </script>
+</body>
+</html>

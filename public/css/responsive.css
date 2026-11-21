@@ -1,0 +1,80 @@
+/* ============================================================
+   AYAMONTE AL DÍA — Adaptación a tablet y móvil
+   ============================================================ */
+
+@media (max-width: 1080px) {
+  .layout { grid-template-columns: 1fr; }
+  .layout .sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.6rem;
+    align-items: start;
+  }
+  .side-block { margin-bottom: .6rem; }
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 1.6rem; }
+  .hero-side { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.3rem; }
+  .hero-secondary { grid-template-columns: 104px 1fr; border-bottom: 0; padding-bottom: 0; }
+  .masthead-side { display: none; }
+  .masthead-inner { justify-content: center; }
+}
+
+@media (max-width: 760px) {
+  .container { width: min(100% - 1.6rem, var(--max)); }
+
+  .nav-toggle { display: block; }
+  .mainnav .container {
+    flex-wrap: wrap;
+    overflow: visible;
+    padding-bottom: .55rem;
+  }
+  .mainnav .nav-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    border-top: 1px solid var(--line);
+    margin-top: .1rem;
+  }
+  .mainnav .nav-links.open { display: flex; }
+  .nav-link {
+    padding: .75rem .3rem;
+    border-bottom: 1px solid var(--line);
+    border-left: 3px solid transparent;
+  }
+  .nav-link.is-active { border-bottom-color: var(--line); border-left-color: var(--accent); }
+
+  .card-grid, .card-grid.two { grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero-lead h1 { font-size: 1.75rem; }
+  .hero-side { grid-template-columns: 1fr; }
+
+  .block-head h2 { font-size: 1.12rem; }
+  .page-head h1 { font-size: 1.7rem; }
+
+  .article-head h1 { font-size: 1.75rem; }
+  .article-body { font-size: 1.04rem; }
+  .article-meta { flex-direction: column; align-items: flex-start; gap: .5rem; }
+
+  .footer-grid { grid-template-columns: 1fr; gap: 1.6rem; }
+  .footer-bottom { flex-direction: column; gap: .5rem; }
+
+  .filters { flex-direction: column; align-items: stretch; }
+  .filters .row-inline { display: flex; gap: .7rem; flex-wrap: wrap; }
+
+  .ultima-hora { flex-direction: column; }
+  .ultima-hora .label { justify-content: center; padding: .55rem; }
+  .ticker { padding: .55rem 0; }
+}
+
+@media (max-width: 480px) {
+  .logo { font-size: 1.9rem; }
+  .logo-sub { letter-spacing: .24em; font-size: .6rem; }
+  .topbar .container { font-size: .66rem; }
+  .topbar-links { gap: .7rem; }
+  .card-row { grid-template-columns: 84px 1fr; }
+  .hero-secondary { grid-template-columns: 88px 1fr; }
+  .hero-secondary h2 { font-size: 1rem; }
+}
