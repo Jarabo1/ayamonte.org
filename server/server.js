@@ -538,7 +538,8 @@ async function handleAdminApi(req, res, parsed) {
 
   // ---- recetas ----
   if (sub === 'recipes' && method === 'GET') {
-    return sendJson(res, 200, db.getRecipes(Number(q.get('limit') || 50)));
+    const rq = parsed.searchParams;
+    return sendJson(res, 200, db.getRecipes(Number(rq.get('limit') || 50)));
   }
   if (sub === 'recipes' && method === 'POST') {
     const body = await readBody(req);
