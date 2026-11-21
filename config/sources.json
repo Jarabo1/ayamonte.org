@@ -83,6 +83,13 @@
       "enabled": true
     },
     {
+      "name": "Isla Cristina (isla-cristina.com)",
+      "url": "https://isla-cristina.com/feed/",
+      "type": "rss",
+      "kind": "comarcal",
+      "enabled": true
+    },
+    {
       "name": "Newtral",
       "url": "https://www.newtral.es/feed/",
       "type": "rss",
