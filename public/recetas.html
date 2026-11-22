@@ -104,6 +104,10 @@ Añadir las gambas y cocinar 2 min." required></textarea>
           </div>
           <div class="form-footer">
             <div class="field" style="flex:1;min-width:200px">
+              <label for="s-image">URL de imagen <span class="hint">(opcional)</span></label>
+              <input type="url" id="s-image" placeholder="https://...">
+            </div>
+            <div class="field" style="flex:1;min-width:200px">
               <label for="s-source">Tu nombre <span class="hint">(opcional)</span></label>
               <input type="text" id="s-source" placeholder="Anónimo">
             </div>
@@ -196,7 +200,8 @@ Añadir las gambas y cocinar 2 min." required></textarea>
             ingredients: document.getElementById('s-ingredients').value.trim(),
             steps: document.getElementById('s-steps').value.trim(),
             source_name: document.getElementById('s-source').value.trim() || 'Usuario',
-            source_url: ''
+            source_url: '',
+            image_url: document.getElementById('s-image').value.trim()
           });
           msg.textContent = '¡Gracias! Tu receta ha sido enviada y será revisada antes de publicarse.';
           msg.style.color = 'var(--success)';
