@@ -286,7 +286,12 @@ async function initArticle() {
       </form>
       <div id="comment-msg" style="margin-top:.6rem;font-size:.9rem"></div>
     `;
-    root.appendChild(commentsSection);
+    const head = root.querySelector('.article-head');
+    if (head && head.parentNode) {
+      head.parentNode.insertBefore(commentsSection, head.nextSibling);
+    } else {
+      root.appendChild(commentsSection);
+    }
     loadComments(slug);
 
     // Asegurar que todos los elementos sean visibles de inmediato
