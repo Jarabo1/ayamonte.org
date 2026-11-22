@@ -295,7 +295,19 @@ async function initArticle() {
           const idx = text.indexOf('Markdown Content:');
           let content = idx !== -1 ? text.slice(idx + 'Markdown Content:'.length).trim() : text.trim();
           // Limpiar líneas de navegación (Facebook, Twitter, etc.)
-          content = content.split('\n').filter((l) => !/^\s*\*\s*\[/.test(l)).join('\n').trim();
+          // Extraer solo el cuerpo del art�culo: desde el primer encabezado #
+          let hIdx = content.indexOf('# ' + (n.title || ''));
+          if (hIdx === -1) hIdx = content.lastIndexOf('# ');
+          if (hIdx !== -1) content = content.slice(hIdx);
+          const endMarkers = ['\\n Etiquetas ', '\\n Etiquetas\\n', '\\n Noticias de hoy', '\\n Lo m�s', '\\n S�guenos ', '\\n Secciones '];
+          let cut = content.length;
+          for (const m of endMarkers) {
+            const i = content.indexOf(m);
+            if (i !== -1 && i < cut) cut = i;
+          }
+          content = content.slice(0, cut).trim();
+          // Limpiar l�neas de navegaci�n (Facebook, Twitter, etc.)
+          content = content.split('\n').filter((l) => !/^\s*\*\s*\[/.test(l) && !/^\s*_/.test(l) && !/^!\[/.test(l)).join('\n').trim();
           if (content.length < 50) {
             el.innerHTML = '<p style="color:var(--ink-mute)">No se pudo extraer el artículo completo. <a href="' + esc(n.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">Leer en la fuente original →</a></p>';
           } else {
