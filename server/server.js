@@ -347,6 +347,19 @@ async function handleApi(req, res, parsed) {
     return sendJson(res, 200, { ok: true, message: 'Receta enviada para revisión' });
   }
 
+  // ---- comentarios (públicos) ----
+  if (pathname === '/api/comments' && req.method === 'GET') {
+    const slug = q.get('slug');
+    if (!slug) return sendJson(res, 400, { error: 'slug obligatorio' });
+    return sendJson(res, 200, db.getComments(slug, true));
+  }
+  if (pathname === '/api/comments' && req.method === 'POST') {
+    const body = await readBody(req);
+    if (!body.news_slug || !body.author || !body.content) return sendJson(res, 400, { error: 'slug, autor y contenido obligatorios' });
+    db.addComment({ news_slug: body.news_slug, author: String(body.author).slice(0, 80), content: String(body.content).slice(0, 1000), status: 'pending' });
+    return sendJson(res, 200, { ok: true, message: 'Comentario enviado para moderación' });
+  }
+
   const detailMatch = pathname.match(/^\/api\/news\/([^/]+)$/);
   if (detailMatch && req.method === 'GET') {
     const slug = decodeURIComponent(detailMatch[1]);
@@ -561,6 +574,24 @@ async function handleAdminApi(req, res, parsed) {
   }
   if (recipeMatch && method === 'DELETE') {
     db.deleteRecipe(Number(recipeMatch[1]));
+    return sendJson(res, 200, { ok: true });
+  }
+
+  // ---- comentarios (admin) ----
+  if (sub === 'comments' && method === 'GET') {
+    const status = (parsed.searchParams.get('status') || '').trim() || null;
+    const cq = parsed.searchParams;
+    return sendJson(res, 200, db.getAllComments(Number(cq.get('limit') || 100), status));
+  }
+  const commentMatch = sub.match(/^comments\/(\d+)$/);
+  if (commentMatch && method === 'PATCH') {
+    const body = await readBody(req);
+    if (body.status && !['pending', 'approved', 'rejected'].includes(body.status)) return sendJson(res, 400, { error: 'Estado no válido' });
+    db.updateComment(Number(commentMatch[1]), body);
+    return sendJson(res, 200, { ok: true });
+  }
+  if (commentMatch && method === 'DELETE') {
+    db.deleteComment(Number(commentMatch[1]));
     return sendJson(res, 200, { ok: true });
   }
 

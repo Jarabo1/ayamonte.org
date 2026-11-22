@@ -124,6 +124,7 @@ $$('.admin-nav button').forEach((b) => {
         news: loadNews,
         sources: loadSources,
         agenda: loadAgenda,
+        comments: loadComments,
         recipes: loadRecipes,
         config: loadConfig,
         history: loadHistory,
@@ -607,7 +608,8 @@ function fillSectionSelect() {
 }
 
 fillSectionSelect();
-checkSession();async function loadRecipes() {
+checkSession();
+async function loadRecipes() {
   const items = await api('/api/admin/recipes');
   $('#recipes-table').innerHTML = items.length
     ? items.map((r) => `<tr>
@@ -657,5 +659,40 @@ document.getElementById('recipe-form').addEventListener('submit', async (e) => {
     await loadRecipes();
   } catch (e) { notify(e.message, true); }
 });
+
+async function loadComments() {
+  const items = await api('/api/admin/comments');
+  $('#comments-table').innerHTML = items.length
+    ? items.map((c) => `<tr>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.news_slug)}</td>
+        <td>${esc(c.author)}</td>
+        <td style="max-width:300px">${esc(c.content)}</td>
+        <td style="font-size:.8rem">${esc(c.created_at)}</td>
+        <td>
+          ${c.status === 'pending' ? '<button class="btn-a small" style="background:#166534" data-appr-cm="' + c.id + '">Aprobar</button> ' : ''}
+          <button class="btn-a small" style="background:#b3261e" data-del-cm="${c.id}">Borrar</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="5">Sin comentarios.</td></tr>';
+
+  $('#comments-table').querySelectorAll('[data-del-cm]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/comments/' + b.dataset.delCm, 'DELETE');
+        notify('Comentario eliminado');
+        await loadComments();
+      } catch (e) { notify(e.message, true); }
+    })
+  );
+  $('#comments-table').querySelectorAll('[data-appr-cm]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/comments/' + b.dataset.apprCm, 'PATCH', { status: 'approved' });
+        notify('Comentario aprobado');
+        await loadComments();
+      } catch (e) { notify(e.message, true); }
+    })
+  );
+}
 
 

@@ -184,6 +184,50 @@ function articleHtml(n, related) {
   `;
 }
 
+async function loadComments(slug) {
+  const list = document.getElementById('comments-list');
+  if (!list) return;
+  try {
+    const items = await API.get('/api/comments?slug=' + encodeURIComponent(slug));
+    if (!items || !items.length) {
+      list.innerHTML = '<p style="color:var(--ink-mute);font-size:.9rem">Aún no hay comentarios. ¡Sé el primero!</p>';
+      return;
+    }
+    list.innerHTML = items.map((c) => `
+      <div style="border-bottom:1px solid var(--line);padding:.8rem 0">
+        <div style="font-weight:700;font-size:.9rem">${esc(c.author)} <span style="font-weight:400;color:var(--ink-mute);font-size:.78rem">· ${esc(c.created_at)}</span></div>
+        <div style="margin-top:.3rem;font-size:.92rem;line-height:1.5">${esc(c.content)}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    list.innerHTML = '<p style="color:var(--ink-mute);font-size:.9rem">No se pudieron cargar los comentarios.</p>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Delegación para el formulario de comentarios (se crea dinámicamente)
+  document.addEventListener('submit', async (e) => {
+    if (e.target && e.target.id === 'comment-form') {
+      e.preventDefault();
+      const slug = slugFromPath();
+      const author = document.getElementById('c-author').value.trim();
+      const content = document.getElementById('c-content').value.trim();
+      const msg = document.getElementById('comment-msg');
+      if (!author || !content) { msg.textContent = 'Completa nombre y comentario.'; msg.style.color = 'var(--accent-red)'; return; }
+      try {
+        await API.send('/api/comments', 'POST', { news_slug: slug, author, content });
+        msg.textContent = 'Comentario enviado. Será publicado tras moderación.';
+        msg.style.color = 'var(--success)';
+        document.getElementById('comment-form').reset();
+        // recargar comentarios (solo aprobados, así que no aparecerá hasta aprobar)
+      } catch (err) {
+        msg.textContent = 'Error: ' + err.message;
+        msg.style.color = 'var(--accent-red)';
+      }
+    }
+  });
+});
+
 async function initArticle() {
   const root = document.getElementById('article-root');
   if (!root) return;
@@ -233,6 +277,23 @@ async function initArticle() {
 
     root.innerHTML = articleHtml(n, related);
     
+    // Sección de comentarios
+    const commentsSection = document.createElement('section');
+    commentsSection.className = 'comments-section';
+    commentsSection.style.marginTop = '2rem';
+    commentsSection.innerHTML = `
+      <h2 style="font-family:var(--serif);border-bottom:2px solid var(--accent);padding-bottom:.3rem">Comentarios</h2>
+      <div id="comments-list" style="margin-top:1rem">Cargando comentarios…</div>
+      <form id="comment-form" style="margin-top:1.2rem;display:flex;flex-direction:column;gap:.6rem;max-width:600px">
+        <div class="field"><label>Nombre</label><input type="text" id="c-author" required placeholder="Tu nombre"></div>
+        <div class="field"><label>Comentario</label><textarea id="c-content" rows="3" required placeholder="Escribe tu comentario…"></textarea></div>
+        <button class="btn-a accent" type="submit" style="align-self:flex-start">Enviar comentario</button>
+      </form>
+      <div id="comment-msg" style="margin-top:.6rem;font-size:.9rem"></div>
+    `;
+    root.appendChild(commentsSection);
+    loadComments(slug);
+
     // Asegurar que todos los elementos sean visibles de inmediato
     root.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
     if (typeof observeReveals === 'function') {

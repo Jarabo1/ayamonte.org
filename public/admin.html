@@ -42,6 +42,7 @@
         <li><button data-view="news">📰 Noticias <span class="badge" id="badge-pending">0</span></button></li>
         <li><button data-view="sources">📡 Fuentes RSS</button></li>
         <li><button data-view="agenda">📅 Agenda</button></li>
+<li><button data-view="comments">💬 Comentarios</button></li>
 <li><button data-view="recipes">🍳 Recetas</button></li>
         <li><button data-view="config">⚙️ Configuración</button></li>
         <li><button data-view="history">🕘 Historial</button></li>
@@ -202,6 +203,22 @@
             <table class="data">
               <thead><tr><th>Fecha</th><th>Evento</th><th>Lugar</th><th></th></tr></thead>
               <tbody id="agenda-table"><tr><td colspan="4">Cargando…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Comentarios ---------- -->
+      <section class="view" id="view-comments">
+        <div class="admin-top">
+          <div><h1>Comentarios</h1><div class="sub">Moderación de comentarios de noticias.</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Comentarios pendientes</h2></div>
+          <div class="panel-body table-wrap">
+            <table class="data">
+              <thead><tr><th>Noticia</th><th>Autor</th><th>Comentario</th><th>Fecha</th><th></th></tr></thead>
+              <tbody id="comments-table"><tr><td colspan="5">Cargando…</td></tr></tbody>
             </table>
           </div>
         </div>

@@ -166,6 +166,15 @@ CREATE TABLE IF NOT EXISTS recipes (
   is_demo       INTEGER NOT NULL DEFAULT 0,
   created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS comments (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  news_slug   TEXT NOT NULL,
+  author      TEXT NOT NULL,
+  content     TEXT NOT NULL,
+  status      TEXT NOT NULL DEFAULT 'pending',
+  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `;
 
 // Migración: añadir columna status si no existe
@@ -645,6 +654,38 @@ function deleteRecipe(id) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Comentarios                                                         */
+/* ------------------------------------------------------------------ */
+function getComments(slug, onlyApproved = true) {
+  const sql = onlyApproved
+    ? 'SELECT * FROM comments WHERE news_slug = ? AND status = ? ORDER BY created_at DESC'
+    : 'SELECT * FROM comments WHERE news_slug = ? ORDER BY created_at DESC';
+  return onlyApproved
+    ? getDb().prepare(sql).all(slug, 'approved')
+    : getDb().prepare(sql).all(slug);
+}
+function addComment(item) {
+  getDb()
+    .prepare('INSERT INTO comments(news_slug, author, content, status) VALUES (?,?,?,?)')
+    .run(item.news_slug, item.author, item.content, item.status || 'pending');
+}
+function updateComment(id, fields) {
+  const sets = [];
+  const vals = [];
+  if (fields.status !== undefined) { sets.push('status = ?'); vals.push(fields.status); }
+  if (!sets.length) return;
+  vals.push(id);
+  getDb().prepare(`UPDATE comments SET ${sets.join(', ')} WHERE id = ?`).run(...vals);
+}
+function deleteComment(id) {
+  getDb().prepare('DELETE FROM comments WHERE id = ?').run(id);
+}
+function getAllComments(limit = 100, status = null) {
+  if (status) return getDb().prepare('SELECT * FROM comments WHERE status = ? ORDER BY created_at DESC LIMIT ?').all(status, limit);
+  return getDb().prepare('SELECT * FROM comments ORDER BY created_at DESC LIMIT ?').all(limit);
+}
+
+/* ------------------------------------------------------------------ */
 /* Sesiones                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -909,6 +950,12 @@ module.exports = {
   addRecipe,
   updateRecipe,
   deleteRecipe,
+  // comentarios
+  getComments,
+  addComment,
+  updateComment,
+  deleteComment,
+  getAllComments,
   // sesiones
   createSession,
   getSession,
