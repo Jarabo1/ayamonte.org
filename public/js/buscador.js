@@ -115,8 +115,6 @@ function articleHtml(n, related) {
             <time datetime="${esc(n.publishedAt || n.fetchedAt)}">${esc(fmtDate(n.publishedAt || n.fetchedAt))}</time>
           </div>
           <div class="meta-right">
-            <span class="meta-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${readTime}</span>
-            ${n.views ? `<span class="meta-pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${n.views} lecturas</span>` : ''}
             ${n.isDemo ? '<span class="demo-tag">Demostración</span>' : ''}
           </div>
         </div>
