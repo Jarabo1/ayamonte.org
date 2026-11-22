@@ -30,12 +30,12 @@ function renderChrome(activeSlug = '') {
           <a href="/noticias">Archivo</a>
           <a href="/privacidad">Privacidad</a>
           <a href="/admin">Admin</a>
-          <span class="demo-badge" id="demo-flag" hidden>Datos de demostración</span>
+          <span class="demo-badge" id="demo-flag" hidden>Datos de demostraciï¿½n</span>
           <div id="google_translate_element" style="display:none"></div>
           <div class="lang-flags">
-            <button type="button" class="lang-flag" data-lang="es" title="Español"><svg viewBox="0 0 3 2" width="22" height="15"><rect width="3" height="2" fill="#c60b1e"/><rect y="0.5" width="3" height="1" fill="#ffc400"/></svg></button>
+            <button type="button" class="lang-flag" data-lang="es" title="Espaï¿½ol"><svg viewBox="0 0 3 2" width="22" height="15"><rect width="3" height="2" fill="#c60b1e"/><rect y="0.5" width="3" height="1" fill="#ffc400"/></svg></button>
             <button type="button" class="lang-flag" data-lang="en" title="English"><svg viewBox="0 0 60 30" width="22" height="11"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4"/><rect x="24" width="12" height="30" fill="#fff"/><rect y="9" width="60" height="12" fill="#fff"/><rect x="26" width="8" height="30" fill="#C8102E"/><rect y="11" width="60" height="8" fill="#C8102E"/></svg></button>
-            <button type="button" class="lang-flag" data-lang="fr" title="Français"><svg viewBox="0 0 3 2" width="22" height="15"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg></button>
+            <button type="button" class="lang-flag" data-lang="fr" title="Franï¿½ais"><svg viewBox="0 0 3 2" width="22" height="15"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg></button>
           </div>
         </div>
       </div>`;
@@ -79,17 +79,22 @@ function renderChrome(activeSlug = '') {
           </div>
           <div>
             <h3>CategorÃ­as</h3>
-            <ul>${SECTIONS.map((s) => `<li><a href="/seccion/${s.slug}">${esc(s.name)}</a></li>`).join('')}</ul>
+            <ul>${SECTIONS.map((s) => `<li><a href="/seccion/${esc(s.slug)}">${esc(s.name)}</a></li>`).join('')}</ul>
+          </div>
+          <div>
+            <h3>Servicios</h3>
+            <ul>
+              <li><a href="/noticias">Archivo de noticias</a></li>
+              <li><a href="/recetas">Recetas</a></li>
+              <li><a href="/tiempo">Tiempo y mareas</a></li>
+              <li><a href="/recorrido-3d">Recorrido 3D</a></li>
+              <li><a href="/resumen">En 2 minutos</a></li>
+              <li><a href="/chat">Asistente</a></li>
+            </ul>
           </div>
           <div>
             <h3>InformaciÃ³n</h3>
             <ul>
-              <li><a href="/noticias">Archivo de noticias</a></li>
-               <li><a href="/resumen">En 2 minutos</a></li>
-               <li><a href="/chat">Asistente</a></li>
-               <li><a href="/recorrido-3d">Recorrido 3D</a></li>
-               <li><a href="/tiempo">Tiempo y mareas</a></li>
-               <li><a href="/recetas">Recetas</a></li>
               <li><a href="/privacidad">PolÃ­tica de privacidad</a></li>
               <li><a href="/aviso-legal">Aviso legal</a></li>
               <li><a href="/sitemap.xml">Sitemap</a></li>
@@ -103,7 +108,6 @@ function renderChrome(activeSlug = '') {
         </div>
       </div>`;
   }
-
   // Aviso de modo demostraciÃ³n
   API.get('/api/status')
     .then((st) => {
