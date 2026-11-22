@@ -30,6 +30,20 @@
     .recipe-detail .ingredients, .recipe-detail .steps { margin-top: .6rem; font-size: .9rem; }
     .recipe-detail .steps ol { padding-left: 1.2rem; }
     .load-more { text-align: center; margin-top: 1.5rem; }
+    .submit-box { background: linear-gradient(135deg, var(--paper) 0%, var(--paper-soft) 100%); border: 1px solid var(--line); border-radius: 12px; padding: 2rem; margin-top: 2.5rem; box-shadow: 0 8px 30px rgba(0,0,0,.06); }
+    .submit-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+    .submit-icon { font-size: 2.2rem; background: var(--accent); color: #fff; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .submit-header h2 { margin: 0; font-family: var(--serif); }
+    .submit-header p { font-size: .9rem; color: var(--ink-mute); margin: .2rem 0 0; }
+    .submit-form .field { display: flex; flex-direction: column; gap: .3rem; }
+    .submit-form label { font-size: .82rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+    .submit-form .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--ink-faint); }
+    .submit-form input, .submit-form textarea { padding: .65rem .85rem; border: 1px solid var(--line); border-radius: 8px; font-size: .95rem; font-family: inherit; transition: border-color .2s, box-shadow .2s; background: var(--paper); }
+    .submit-form input:focus, .submit-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,42,42,.12); }
+    .submit-form textarea { resize: vertical; min-height: 80px; }
+    .form-footer { display: flex; flex-wrap: wrap; gap: .8rem; align-items: flex-end; margin-top: .5rem; }
+    .submit-btn { padding: .65rem 1.8rem !important; font-size: .95rem !important; }
+    .submit-msg { padding: .9rem 1rem; border-radius: 8px; font-weight: 600; }
   </style>
 </head>
 <body data-page="recetas" data-section="recetas">
@@ -58,26 +72,45 @@
       <div class="load-more"><button class="btn-a ghost" id="load-more" style="display:none">Ver más recetas</button></div>
 
       <section class="submit-box">
-        <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem">
-          <span style="font-size:2rem">🍳</span>
+        <div class="submit-header">
+          <div class="submit-icon">🍳</div>
           <div>
-            <h2 style="margin:0">Aporta tu receta</h2>
-            <p style="font-size:.9rem;color:var(--ink-mute);margin:.2rem 0 0">Comparte un plato típico de la comarca. Será revisado antes de publicarse.</p>
+            <h2>Aporta tu receta</h2>
+            <p>Comparte un plato típico de la comarca. Será revisado antes de publicarse.</p>
           </div>
         </div>
-        <form id="submit-form">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.8rem">
-            <div class="field"><label>Título del plato</label><input type="text" id="s-title" placeholder="Ej: Gambas al ajillo" required></div>
-            <div class="field"><label>Lugar de origen</label><input type="text" id="s-origin" placeholder="Ayamonte, Isla Cristina..." required></div>
+        <form id="submit-form" class="submit-form">
+          <div class="form-grid">
+            <div class="field">
+              <label for="s-title">Título del plato</label>
+              <input type="text" id="s-title" placeholder="Ej: Gambas al ajillo" required>
+            </div>
+            <div class="field">
+              <label for="s-origin">Lugar de origen</label>
+              <input type="text" id="s-origin" placeholder="Ayamonte, Isla Cristina..." required>
+            </div>
           </div>
-          <div class="field" style="margin-bottom:.8rem"><label>Ingredientes (uno por línea)</label><textarea id="s-ingredients" rows="4" placeholder="200 g de gambas`n2 dientes de ajo`nAceite de oliva" required></textarea></div>
-          <div class="field" style="margin-bottom:.8rem"><label>Elaboración (un paso por línea)</label><textarea id="s-steps" rows="5" placeholder="Pelar las gambas.`nSofreír el ajo en aceite.`nAñadir las gambas y cocinar 2 min." required></textarea></div>
-          <div style="display:flex;flex-wrap:wrap;gap:.8rem;align-items:flex-end">
-            <div class="field" style="flex:1;min-width:200px"><label>Tu nombre (opcional)</label><input type="text" id="s-source" placeholder="Anónimo"></div>
-            <div class="field"><button class="btn-a accent" type="submit" style="padding:.6rem 1.5rem">Enviar receta</button></div>
+          <div class="field">
+            <label for="s-ingredients">Ingredientes <span class="hint">(uno por línea)</span></label>
+            <textarea id="s-ingredients" rows="4" placeholder="200 g de gambas
+2 dientes de ajo
+Aceite de oliva" required></textarea>
+          </div>
+          <div class="field">
+            <label for="s-steps">Elaboración <span class="hint">(un paso por línea)</span></label>
+            <textarea id="s-steps" rows="5" placeholder="Pelar las gambas.
+Sofreír el ajo en aceite.
+Añadir las gambas y cocinar 2 min." required></textarea>
+          </div>
+          <div class="form-footer">
+            <div class="field" style="flex:1;min-width:200px">
+              <label for="s-source">Tu nombre <span class="hint">(opcional)</span></label>
+              <input type="text" id="s-source" placeholder="Anónimo">
+            </div>
+            <button class="btn-a accent submit-btn" type="submit">Enviar receta</button>
           </div>
         </form>
-        <div id="submit-msg" style="margin-top:1rem;padding:.8rem;border-radius:6px;display:none"></div>
+        <div id="submit-msg" class="submit-msg" style="display:none"></div>
       </section>
     </div>
   </main>
