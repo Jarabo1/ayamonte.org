@@ -136,7 +136,7 @@ Añadir las gambas y cocinar 2 min." required></textarea>
 
       function render() {
         const filtered = currentFilter === 'Todos' ? allRecipes : allRecipes.filter((r) => (r.origin || '').toLowerCase().includes(currentFilter.toLowerCase()));
-        const toShow = filtered.slice(0, shown);
+        const toShow = currentFilter === 'Todos' ? filtered : filtered.slice(0, shown);
         grid.innerHTML = toShow.map((r) => {
           const img = r.image_url || '/assets/images/placeholder-sociedad.svg';
           const preview = (r.ingredients || '').split('\n')[0] || '';
@@ -166,7 +166,7 @@ Añadir las gambas y cocinar 2 min." required></textarea>
           });
         });
 
-        loadMoreBtn.style.display = shown < filtered.length ? 'inline-block' : 'none';
+        loadMoreBtn.style.display = (currentFilter !== 'Todos' && shown < filtered.length) ? 'inline-block' : 'none';
       }
 
       API.get('/api/recipes?limit=100').then((items) => {
