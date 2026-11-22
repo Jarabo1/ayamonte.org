@@ -130,7 +130,7 @@ Añadir las gambas y cocinar 2 min." required></textarea>
       const loadMoreBtn = document.getElementById('load-more');
       let allRecipes = [];
       let currentFilter = 'Todos';
-      let shown = 6;
+      let shown = 12;
 
       function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -188,7 +188,7 @@ Añadir las gambas y cocinar 2 min." required></textarea>
         grid.innerHTML = '<div class="empty is-visible">Error: ' + esc(e.message) + '</div>';
       });
 
-      loadMoreBtn.addEventListener('click', () => { shown += 6; render(); });
+      loadMoreBtn.addEventListener('click', () => { shown += 12; render(); });
 
       document.getElementById('submit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
