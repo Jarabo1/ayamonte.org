@@ -167,14 +167,11 @@ function articleHtml(n, related) {
         </section>
       </div>
 
-      <!-- Barra para compartir -->
-      <div class="article-share-section" style="max-width:760px;margin:2rem auto 0;">
-        <div style="font-size:.85rem;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.8rem;text-align:center;">Comparte esta noticia</div>
+      <!-- Compartir y etiquetas en una sola fila -->
+      <div class="article-share-section" style="max-width:760px;margin:2rem auto 0;padding-top:1.2rem;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.6rem;">
+        <span style="font-size:.85rem;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.08em;">Compartir</span>
         ${buildShareBar(n)}
-      </div>
-
-      <!-- Etiquetas -->
-      <div class="tag-bar" style="max-width:760px;margin:1.4rem auto 0;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;">
+        <span style="font-size:.85rem;font-weight:700;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.08em;margin-left:.6rem;">Etiquetas</span>
         <a class="share-btn" href="/seccion/${esc(n.section)}">#${esc(sectionLabel)}</a>
         ${(n.tags || []).map((t) => `<a class="share-btn" href="/noticias?q=${encodeURIComponent(t)}">#${esc(t)}</a>`).join('')}
       </div>
@@ -277,50 +274,6 @@ async function initArticle() {
 
     root.innerHTML = articleHtml(n, related);
 
-    // Artículo completo (extraído de la fuente original)
-    const fullBox = document.createElement('section');
-    fullBox.className = 'full-article';
-    fullBox.style.marginTop = '2rem';
-    fullBox.innerHTML = '<h2 style="font-family:var(--serif);border-bottom:2px solid var(--accent);padding-bottom:.3rem">Artículo completo</h2><div id="full-content" style="margin-top:1rem;color:var(--ink-soft);line-height:1.7;white-space:pre-wrap;font-size:.95rem">Cargando artículo completo…</div><p style="margin-top:.8rem;font-size:.8rem;color:var(--ink-mute)">Fuente original: <a href="' + esc(n.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">' + esc(n.source || n.url) + '</a></p>';
-    root.appendChild(fullBox);
-
-    // Cargar contenido completo desde Jina AI Reader
-    if (n.url) {
-      fetch('https://r.jina.ai/' + n.url)
-        .then((r) => r.text())
-        .then((text) => {
-          const el = document.getElementById('full-content');
-          if (!el) return;
-          // Extraer solo el Markdown Content
-          const idx = text.indexOf('Markdown Content:');
-          let content = idx !== -1 ? text.slice(idx + 'Markdown Content:'.length).trim() : text.trim();
-          // Limpiar líneas de navegación (Facebook, Twitter, etc.)
-          // Extraer solo el cuerpo del art�culo: desde el primer encabezado #
-          let hIdx = content.indexOf('# ' + (n.title || ''));
-          if (hIdx === -1) hIdx = content.lastIndexOf('# ');
-          if (hIdx !== -1) content = content.slice(hIdx);
-const endMarkers = ['\n Etiquetas ', '\n Etiquetas\n', '\n Noticias de hoy', '\n Lo más', '\n Síguenos ', '\n Secciones '];
-          let cut = content.length;
-          for (const m of endMarkers) {
-            const i = content.indexOf(m);
-            if (i !== -1 && i < cut) cut = i;
-          }
-          content = content.slice(0, cut).trim();
-          // Limpiar l�neas de navegaci�n (Facebook, Twitter, etc.)
-          content = content.split('\n').filter((l) => !/^\s*\*\s*\[/.test(l) && !/^\s*_/.test(l) && !/^!\[/.test(l)).join('\n').trim();
-          if (content.length < 50) {
-            el.innerHTML = '<p style="color:var(--ink-mute)">No se pudo extraer el artículo completo. <a href="' + esc(n.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">Leer en la fuente original →</a></p>';
-          } else {
-            el.innerHTML = content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-            el.innerHTML = '<p>' + el.innerHTML + '</p>';
-          }
-        })
-        .catch(() => {
-          const el = document.getElementById('full-content');
-          if (el) el.innerHTML = '<p style="color:var(--ink-mute)">No se pudo cargar el artículo completo. <a href="' + esc(n.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">Leer en la fuente original →</a></p>';
-        });
-    }
-    
     // Sección de comentarios
     const commentsSection = document.createElement('section');
     commentsSection.className = 'comments-section';
