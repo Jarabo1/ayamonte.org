@@ -337,6 +337,11 @@ async function handleApi(req, res, parsed) {
   if (pathname === '/api/agenda' && req.method === 'GET') {
     return sendJson(res, 200, db.getAgenda(Number(q.get('limit') || 8)));
   }
+  if (pathname === '/api/pending' && req.method === 'GET') {
+    const comments = db.getAllComments(1000, 'pending').length;
+    const recipes = db.getRecipes(1000, false).filter((r) => r.status === 'pending').length;
+    return sendJson(res, 200, { comments, recipes, total: comments + recipes });
+  }
   if (pathname === '/api/recipes' && req.method === 'GET') {
     return sendJson(res, 200, db.getRecipes(Number(q.get('limit') || 50), true));
   }

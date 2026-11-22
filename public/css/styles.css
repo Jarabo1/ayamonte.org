@@ -1087,3 +1087,5 @@ a:hover .media img, .card:hover .media img { transform: scale(1.045); }
 .lang-flag:hover { background: rgba(255,255,255,.18); }
 
 .nav-links { display: flex; gap: .1rem; flex-wrap: wrap; }
+
+/* Badge de pendientes (admin) */\n.pending-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #f59e0b; color: #111; font-size: .65rem; font-weight: 800; margin-left: .3rem; vertical-align: middle; }\n.pending-badge[hidden] { display: none; }\n

@@ -29,7 +29,7 @@ function renderChrome(activeSlug = '') {
         <div class="topbar-links">
           <a href="/noticias">Archivo</a>
           <a href="/privacidad">Privacidad</a>
-          <a href="/admin">Admin</a>
+          <a href="/admin">Admin <span id="pending-badge" class="pending-badge" hidden></span></a>
           <span class="demo-badge" id="demo-flag" hidden>Datos de demostraci�n</span>
           <div id="google_translate_element" style="display:none"></div>
           <div class="lang-flags">
@@ -42,6 +42,15 @@ function renderChrome(activeSlug = '') {
   }
   }
   }
+
+  // Indicador de pendientes para el admin
+  API.get('/api/pending').then((p) => {
+    const badge = document.getElementById('pending-badge');
+    if (badge && p && p.total > 0) {
+      badge.textContent = p.total;
+      badge.hidden = false;
+    }
+  }).catch(() => {});
 
   if (nav) {
     const links = SECTIONS.map(
