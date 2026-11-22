@@ -276,6 +276,38 @@ async function initArticle() {
     ldScript.textContent = JSON.stringify(ld);
 
     root.innerHTML = articleHtml(n, related);
+
+    // Artículo completo (extraído de la fuente original)
+    const fullBox = document.createElement('section');
+    fullBox.className = 'full-article';
+    fullBox.style.marginTop = '2rem';
+    fullBox.innerHTML = '<h2 style="font-family:var(--serif);border-bottom:2px solid var(--accent);padding-bottom:.3rem">Artículo completo</h2><div id="full-content" style="margin-top:1rem;color:var(--ink-soft);line-height:1.7;white-space:pre-wrap;font-size:.95rem">Cargando artículo completo…</div><p style="margin-top:.8rem;font-size:.8rem;color:var(--ink-mute)">Fuente original: <a href="' + esc(n.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">' + esc(n.source || n.url) + '</a></p>';
+    root.appendChild(fullBox);
+
+    // Cargar contenido completo desde Jina AI Reader
+    if (n.url) {
+      fetch('https://r.jina.ai/' + n.url)
+        .then((r) => r.text())
+        .then((text) => {
+          const el = document.getElementById('full-content');
+          if (!el) return;
+          // Extraer solo el Markdown Content
+          const idx = text.indexOf('Markdown Content:');
+          let content = idx !== -1 ? text.slice(idx + 'Markdown Content:'.length).trim() : text.trim();
+          // Limpiar líneas de navegación (Facebook, Twitter, etc.)
+          content = content.split('\n').filter((l) => !/^\s*\*\s*\[/.test(l)).join('\n').trim();
+          if (content.length < 50) {
+            el.innerHTML = '<p style="color:var(--ink-mute)">No se pudo extraer el artículo completo. <a href="' + esc(n.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">Leer en la fuente original →</a></p>';
+          } else {
+            el.innerHTML = content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+            el.innerHTML = '<p>' + el.innerHTML + '</p>';
+          }
+        })
+        .catch(() => {
+          const el = document.getElementById('full-content');
+          if (el) el.innerHTML = '<p style="color:var(--ink-mute)">No se pudo cargar el artículo completo. <a href="' + esc(n.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">Leer en la fuente original →</a></p>';
+        });
+    }
     
     // Sección de comentarios
     const commentsSection = document.createElement('section');

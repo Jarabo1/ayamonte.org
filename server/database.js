@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS news (
   alt_title      TEXT,
   summary        TEXT NOT NULL DEFAULT '',
   body_excerpt   TEXT NOT NULL DEFAULT '',
+  content        TEXT,
   url            TEXT NOT NULL,
   canonical      TEXT NOT NULL DEFAULT '',
   image_url      TEXT,
@@ -190,6 +191,7 @@ function init() {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   db = new DatabaseSync(file);
   db.exec(SCHEMA);
+  try { db.exec("ALTER TABLE news ADD COLUMN content TEXT"); } catch (e) {}
   seedConfig();
   seedCategories();
   seedSources();
