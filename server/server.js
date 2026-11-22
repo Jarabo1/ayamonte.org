@@ -338,7 +338,13 @@ async function handleApi(req, res, parsed) {
     return sendJson(res, 200, db.getAgenda(Number(q.get('limit') || 8)));
   }
   if (pathname === '/api/recipes' && req.method === 'GET') {
-    return sendJson(res, 200, db.getRecipes(Number(q.get('limit') || 50)));
+    return sendJson(res, 200, db.getRecipes(Number(q.get('limit') || 50), true));
+  }
+  if (pathname === '/api/recipes' && req.method === 'POST') {
+    const body = await readBody(req);
+    if (!body.title || !body.ingredients || !body.steps) return sendJson(res, 400, { error: 'Título, ingredientes y elaboración obligatorios' });
+    db.addRecipe({ ...body, status: 'pending', is_demo: 0 });
+    return sendJson(res, 200, { ok: true, message: 'Receta enviada para revisión' });
   }
 
   const detailMatch = pathname.match(/^\/api\/news\/([^/]+)$/);
@@ -539,7 +545,7 @@ async function handleAdminApi(req, res, parsed) {
   // ---- recetas ----
   if (sub === 'recipes' && method === 'GET') {
     const rq = parsed.searchParams;
-    return sendJson(res, 200, db.getRecipes(Number(rq.get('limit') || 50)));
+    return sendJson(res, 200, db.getRecipes(Number(rq.get('limit') || 50), false));
   }
   if (sub === 'recipes' && method === 'POST') {
     const body = await readBody(req);

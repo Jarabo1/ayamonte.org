@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Recetas de la comarca — Ayamonte.org</title>
-  <meta name="description" content="Recetas gastronómicas de Ayamonte y su comarca, con elaboración y origen.">
+  <meta name="description" content="Recetas gastronómicas de Ayamonte y su comarca, con ingredientes, elaboración y origen.">
   <link rel="canonical" href="/recetas">
   <meta name="theme-color" content="#c92a2a">
   <meta property="og:image" content="/assets/icons/favicon.svg">
@@ -13,11 +13,17 @@
   <link rel="stylesheet" href="/css/styles.css?v=10">
   <link rel="stylesheet" href="/css/responsive.css">
   <style>
-    .recipe-card { background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.2rem; }
+    .recipe-card { background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.2rem; display: flex; gap: 1rem; }
+    .recipe-card img { width: 120px; height: 90px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+    .recipe-card .body { flex: 1; }
     .recipe-card h3 { font-family: var(--serif); margin: 0 0 .4rem; }
     .recipe-meta { font-size: .8rem; color: var(--ink-mute); margin-bottom: .8rem; }
-    .recipe-card .ingredients, .recipe-card .steps { margin-top: .8rem; }
+    .recipe-card .ingredients, .recipe-card .steps { margin-top: .8rem; font-size: .92rem; }
     .recipe-card .steps ol { padding-left: 1.2rem; }
+    .place-group { margin-bottom: 2rem; }
+    .place-group h2 { font-family: var(--serif); border-bottom: 2px solid var(--accent); padding-bottom: .3rem; margin-bottom: 1rem; }
+    .submit-box { background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; margin-top: 2rem; }
+    .submit-box textarea { width: 100%; min-height: 80px; }
   </style>
 </head>
 <body data-page="recetas" data-section="recetas">
@@ -38,9 +44,25 @@
       <div class="page-head">
         <div class="breadcrumbs"><a href="/">Portada</a> / Recetas</div>
         <h1>Recetas de la comarca</h1>
-        <p>Platos típicos de Ayamonte y su comarca, con ingredientes, elaboración y origen.</p>
+        <p>Platos típicos de Ayamonte y su comarca, con ingredientes, elaboración y origen. Aporta la tuya.</p>
       </div>
       <div id="recipes-list">Cargando recetas…</div>
+
+      <section class="submit-box">
+        <h2>Aporta tu receta</h2>
+        <p style="font-size:.9rem;color:var(--ink-mute)">Tu receta será revisada antes de publicarse.</p>
+        <form id="submit-form">
+          <div class="form-row" style="flex-wrap:wrap;gap:.7rem">
+            <div class="field" style="flex:1;min-width:200px"><label>Título</label><input type="text" id="s-title" required></div>
+            <div class="field" style="flex:1;min-width:200px"><label>Origen (lugar)</label><input type="text" id="s-origin" placeholder="Ayamonte, Isla Cristina..." required></div>
+            <div class="field" style="flex-basis:100%"><label>Ingredientes</label><textarea id="s-ingredients" required></textarea></div>
+            <div class="field" style="flex-basis:100%"><label>Elaboración</label><textarea id="s-steps" required></textarea></div>
+            <div class="field" style="flex:1;min-width:200px"><label>Tu nombre (opcional)</label><input type="text" id="s-source"></div>
+            <div class="field" style="justify-content:flex-end"><button class="btn-a accent" type="submit">Enviar receta</button></div>
+          </div>
+        </form>
+        <div id="submit-msg" style="margin-top:.8rem;font-size:.9rem"></div>
+      </section>
     </div>
   </main>
 
@@ -50,24 +72,57 @@
   <script src="/js/main.js?v=7"></script>
   <script>
     (function () {
-      API.get('/api/recipes?limit=50').then((items) => {
-        const root = document.getElementById('recipes-list');
+      const root = document.getElementById('recipes-list');
+      API.get('/api/recipes?limit=100').then((items) => {
         if (!items || !items.length) {
-          root.innerHTML = '<div class="empty is-visible">Aún no hay recetas. Se añadirán pronto.</div>';
+          root.innerHTML = '<div class="empty is-visible">Aún no hay recetas. ¡Sé el primero en aportar una!</div>';
           return;
         }
-        root.innerHTML = items.map((r) => {
-          const ing = r.ingredients ? '<div class="ingredients"><strong>Ingredientes:</strong><br>' + esc(r.ingredients).replace(/\n/g, '<br>') + '</div>' : '';
-          const steps = r.steps ? '<div class="steps"><strong>Elaboración:</strong><ol>' + r.steps.split('\n').filter(Boolean).map((s) => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' : '';
-          const meta = [r.origin, r.source_name].filter(Boolean).map(esc).join(' · ');
-          return '<article class="recipe-card"><h3>' + esc(r.title) + '</h3>' +
-            (meta ? '<div class="recipe-meta">' + meta + '</div>' : '') +
-            ing + steps +
-            (r.source_url ? '<div style="margin-top:.8rem"><a href="' + esc(r.source_url) + '" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Fuente original →</a></div>' : '') +
-            '</article>';
+        // Agrupar por origen
+        const groups = {};
+        items.forEach((r) => {
+          const place = (r.origin || 'Otros').trim();
+          if (!groups[place]) groups[place] = [];
+          groups[place].push(r);
+        });
+        const html = Object.keys(groups).sort().map((place) => {
+          const cards = groups[place].map((r) => {
+            const img = r.image_url ? '<img src="' + esc(r.image_url) + '" alt="' + esc(r.title) + '" onerror="this.style.display=\'none\'">' : '';
+            const ing = r.ingredients ? '<div class="ingredients"><strong>Ingredientes:</strong><br>' + esc(r.ingredients).replace(/\n/g, '<br>') + '</div>' : '';
+            const steps = r.steps ? '<div class="steps"><strong>Elaboración:</strong><ol>' + r.steps.split('\n').filter(Boolean).map((s) => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' : '';
+            const meta = [r.source_name].filter(Boolean).map(esc).join(' · ');
+            return '<article class="recipe-card">' + img + '<div class="body"><h3>' + esc(r.title) + '</h3>' +
+              (meta ? '<div class="recipe-meta">' + meta + '</div>' : '') +
+              ing + steps +
+              (r.source_url ? '<div style="margin-top:.8rem"><a href="' + esc(r.source_url) + '" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Fuente original →</a></div>' : '') +
+              '</div></article>';
+          }).join('');
+          return '<div class="place-group"><h2>' + esc(place) + '</h2>' + cards + '</div>';
         }).join('');
+        root.innerHTML = html;
       }).catch((e) => {
-        document.getElementById('recipes-list').innerHTML = '<div class="empty is-visible">Error: ' + esc(e.message) + '</div>';
+        root.innerHTML = '<div class="empty is-visible">Error: ' + esc(e.message) + '</div>';
+      });
+
+      document.getElementById('submit-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('submit-msg');
+        try {
+          await API.send('/api/recipes', 'POST', {
+            title: document.getElementById('s-title').value.trim(),
+            origin: document.getElementById('s-origin').value.trim(),
+            ingredients: document.getElementById('s-ingredients').value.trim(),
+            steps: document.getElementById('s-steps').value.trim(),
+            source_name: document.getElementById('s-source').value.trim() || 'Usuario',
+            source_url: ''
+          });
+          msg.textContent = '¡Gracias! Tu receta ha sido enviada y será revisada antes de publicarse.';
+          msg.style.color = 'var(--success)';
+          document.getElementById('submit-form').reset();
+        } catch (err) {
+          msg.textContent = 'Error: ' + err.message;
+          msg.style.color = 'var(--accent-red)';
+        }
       });
     })();
   </script>

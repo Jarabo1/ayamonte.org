@@ -162,10 +162,14 @@ CREATE TABLE IF NOT EXISTS recipes (
   source_name   TEXT,
   source_url    TEXT,
   image_url     TEXT,
+  status        TEXT NOT NULL DEFAULT 'approved',
   is_demo       INTEGER NOT NULL DEFAULT 0,
   created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `;
+
+// Migración: añadir columna status si no existe
+try { getDb().exec("ALTER TABLE recipes ADD COLUMN status TEXT NOT NULL DEFAULT 'approved'"); } catch (e) {}
 
 /* ------------------------------------------------------------------ */
 /* Inicialización                                                      */
@@ -609,13 +613,18 @@ function deleteAgenda(id) {
 /* ------------------------------------------------------------------ */
 /* Recetas gastronómicas                                               */
 /* ------------------------------------------------------------------ */
-function getRecipes(limit = 50) {
-  return getDb().prepare('SELECT * FROM recipes ORDER BY created_at DESC LIMIT ?').all(limit);
+function getRecipes(limit = 50, onlyApproved = true) {
+  const sql = onlyApproved
+    ? 'SELECT * FROM recipes WHERE status = ? ORDER BY created_at DESC LIMIT ?'
+    : 'SELECT * FROM recipes ORDER BY created_at DESC LIMIT ?';
+  return onlyApproved
+    ? getDb().prepare(sql).all('approved', limit)
+    : getDb().prepare(sql).all(limit);
 }
 function addRecipe(item) {
   getDb()
-    .prepare('INSERT INTO recipes(title, origin, ingredients, steps, source_name, source_url, image_url, is_demo) VALUES (?,?,?,?,?,?,?,?)')
-    .run(item.title, item.origin || null, item.ingredients || null, item.steps || null, item.source_name || null, item.source_url || null, item.image_url || null, item.is_demo ? 1 : 0);
+    .prepare('INSERT INTO recipes(title, origin, ingredients, steps, source_name, source_url, image_url, status, is_demo) VALUES (?,?,?,?,?,?,?,?,?)')
+    .run(item.title, item.origin || null, item.ingredients || null, item.steps || null, item.source_name || null, item.source_url || null, item.image_url || null, item.status || 'approved', item.is_demo ? 1 : 0);
 }
 function updateRecipe(id, fields) {
   const sets = [];
