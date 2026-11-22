@@ -13,17 +13,23 @@
   <link rel="stylesheet" href="/css/styles.css?v=10">
   <link rel="stylesheet" href="/css/responsive.css">
   <style>
-    .recipe-card { background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.2rem; display: flex; gap: 1rem; }
-    .recipe-card img { width: 120px; height: 90px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
-    .recipe-card .body { flex: 1; }
-    .recipe-card h3 { font-family: var(--serif); margin: 0 0 .4rem; }
-    .recipe-meta { font-size: .8rem; color: var(--ink-mute); margin-bottom: .8rem; }
-    .recipe-card .ingredients, .recipe-card .steps { margin-top: .8rem; font-size: .92rem; }
-    .recipe-card .steps ol { padding-left: 1.2rem; }
-    .place-group { margin-bottom: 2rem; }
-    .place-group h2 { font-family: var(--serif); border-bottom: 2px solid var(--accent); padding-bottom: .3rem; margin-bottom: 1rem; }
-    .submit-box { background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; margin-top: 2rem; }
-    .submit-box textarea { width: 100%; min-height: 80px; }
+    .recipe-filters { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .recipe-filters button { padding: .4rem .9rem; border: 1px solid var(--line); background: var(--paper); border-radius: 20px; cursor: pointer; font-size: .85rem; transition: all .2s; }
+    .recipe-filters button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
+    .recipe-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+    .recipe-card img { width: 100%; height: 160px; object-fit: cover; }
+    .recipe-card .body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+    .recipe-card h3 { font-family: var(--serif); margin: 0 0 .3rem; font-size: 1.05rem; }
+    .recipe-card .origin { font-size: .78rem; color: var(--ink-mute); margin-bottom: .6rem; }
+    .recipe-card .preview { font-size: .88rem; color: var(--ink-soft); flex: 1; }
+    .recipe-card .actions { margin-top: .8rem; display: flex; gap: .5rem; }
+    .recipe-card .actions button { padding: .35rem .7rem; font-size: .8rem; }
+    .recipe-detail { display: none; padding: 0 1rem 1rem; }
+    .recipe-detail.open { display: block; }
+    .recipe-detail .ingredients, .recipe-detail .steps { margin-top: .6rem; font-size: .9rem; }
+    .recipe-detail .steps ol { padding-left: 1.2rem; }
+    .load-more { text-align: center; margin-top: 1.5rem; }
   </style>
 </head>
 <body data-page="recetas" data-section="recetas">
@@ -44,15 +50,18 @@
       <div class="page-head">
         <div class="breadcrumbs"><a href="/">Portada</a> / Recetas</div>
         <h1>Recetas de la comarca</h1>
-        <p>Platos típicos de Ayamonte y su comarca, con ingredientes, elaboración y origen. Aporta la tuya.</p>
+        <p>Platos típicos de Ayamonte y su comarca. Aporta la tuya.</p>
       </div>
-      <div id="recipes-list">Cargando recetas…</div>
+
+      <div class="recipe-filters" id="filters"></div>
+      <div class="recipe-grid" id="grid"></div>
+      <div class="load-more"><button class="btn-a ghost" id="load-more" style="display:none">Ver más recetas</button></div>
 
       <section class="submit-box">
         <h2>Aporta tu receta</h2>
         <p style="font-size:.9rem;color:var(--ink-mute)">Tu receta será revisada antes de publicarse.</p>
         <form id="submit-form">
-          <div class="form-row" style="flex-wrap:wrap;gap:.7rem">
+          <div style="display:flex;flex-wrap:wrap;gap:.7rem">
             <div class="field" style="flex:1;min-width:200px"><label>Título</label><input type="text" id="s-title" required></div>
             <div class="field" style="flex:1;min-width:200px"><label>Origen (lugar)</label><input type="text" id="s-origin" placeholder="Ayamonte, Isla Cristina..." required></div>
             <div class="field" style="flex-basis:100%"><label>Ingredientes</label><textarea id="s-ingredients" required></textarea></div>
@@ -72,37 +81,70 @@
   <script src="/js/main.js?v=7"></script>
   <script>
     (function () {
-      const root = document.getElementById('recipes-list');
-      API.get('/api/recipes?limit=100').then((items) => {
-        if (!items || !items.length) {
-          root.innerHTML = '<div class="empty is-visible">Aún no hay recetas. ¡Sé el primero en aportar una!</div>';
-          return;
-        }
-        // Agrupar por origen
-        const groups = {};
-        items.forEach((r) => {
-          const place = (r.origin || 'Otros').trim();
-          if (!groups[place]) groups[place] = [];
-          groups[place].push(r);
-        });
-        const html = Object.keys(groups).sort().map((place) => {
-          const cards = groups[place].map((r) => {
-            const img = r.image_url ? '<img src="' + esc(r.image_url) + '" alt="' + esc(r.title) + '" onerror="this.style.display=\'none\'">' : '';
-            const ing = r.ingredients ? '<div class="ingredients"><strong>Ingredientes:</strong><br>' + esc(r.ingredients).replace(/\n/g, '<br>') + '</div>' : '';
-            const steps = r.steps ? '<div class="steps"><strong>Elaboración:</strong><ol>' + r.steps.split('\n').filter(Boolean).map((s) => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' : '';
-            const meta = [r.source_name].filter(Boolean).map(esc).join(' · ');
-            return '<article class="recipe-card">' + img + '<div class="body"><h3>' + esc(r.title) + '</h3>' +
-              (meta ? '<div class="recipe-meta">' + meta + '</div>' : '') +
-              ing + steps +
-              (r.source_url ? '<div style="margin-top:.8rem"><a href="' + esc(r.source_url) + '" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Fuente original →</a></div>' : '') +
-              '</div></article>';
-          }).join('');
-          return '<div class="place-group"><h2>' + esc(place) + '</h2>' + cards + '</div>';
+      const grid = document.getElementById('grid');
+      const filtersEl = document.getElementById('filters');
+      const loadMoreBtn = document.getElementById('load-more');
+      let allRecipes = [];
+      let currentFilter = 'Todos';
+      let shown = 6;
+
+      function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+      function render() {
+        const filtered = currentFilter === 'Todos' ? allRecipes : allRecipes.filter((r) => (r.origin || '').toLowerCase().includes(currentFilter.toLowerCase()));
+        const toShow = filtered.slice(0, shown);
+        grid.innerHTML = toShow.map((r) => {
+          const img = r.image_url || '/assets/images/placeholder-sociedad.svg';
+          const preview = (r.ingredients || '').split('\n')[0] || '';
+          return '<article class="recipe-card">' +
+            '<img src="' + esc(img) + '" alt="' + esc(r.title) + '" onerror="this.src=\'/assets/images/placeholder-default.svg\'">' +
+            '<div class="body">' +
+            '<h3>' + esc(r.title) + '</h3>' +
+            '<div class="origin">' + esc(r.origin || '') + (r.source_name ? ' · ' + esc(r.source_name) : '') + '</div>' +
+            '<div class="preview">' + esc(preview) + (preview.length < (r.ingredients||'').length ? '…' : '') + '</div>' +
+            '<div class="actions">' +
+            '<button class="btn-a small" data-id="' + r.id + '">Ver receta</button>' +
+            '</div></div>' +
+            '<div class="recipe-detail" id="detail-' + r.id + '">' +
+            (r.ingredients ? '<div class="ingredients"><strong>Ingredientes:</strong><br>' + esc(r.ingredients).replace(/\n/g, '<br>') + '</div>' : '') +
+            (r.steps ? '<div class="steps"><strong>Elaboración:</strong><ol>' + r.steps.split('\n').filter(Boolean).map((s) => '<li>' + esc(s) + '</li>').join('') + '</ol></div>' : '') +
+            (r.source_url ? '<div style="margin-top:.6rem"><a href="' + esc(r.source_url) + '" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">Fuente original →</a></div>' : '') +
+            '</div></article>';
         }).join('');
-        root.innerHTML = html;
+
+        grid.querySelectorAll('[data-id]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const d = document.getElementById('detail-' + btn.dataset.id);
+            if (d) {
+              d.classList.toggle('open');
+              btn.textContent = d.classList.contains('open') ? 'Ocultar' : 'Ver receta';
+            }
+          });
+        });
+
+        loadMoreBtn.style.display = shown < filtered.length ? 'inline-block' : 'none';
+      }
+
+      API.get('/api/recipes?limit=100').then((items) => {
+        allRecipes = items || [];
+        // Filtros por lugar
+        const places = ['Todos'].concat([...new Set(allRecipes.map((r) => (r.origin || '').split('/')[0].trim()).filter(Boolean))].sort());
+        filtersEl.innerHTML = places.map((p) => '<button class="' + (p === 'Todos' ? 'active' : '') + '" data-place="' + esc(p) + '">' + esc(p) + '</button>').join('');
+        filtersEl.querySelectorAll('button').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            filtersEl.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.place;
+            shown = 6;
+            render();
+          });
+        });
+        render();
       }).catch((e) => {
-        root.innerHTML = '<div class="empty is-visible">Error: ' + esc(e.message) + '</div>';
+        grid.innerHTML = '<div class="empty is-visible">Error: ' + esc(e.message) + '</div>';
       });
+
+      loadMoreBtn.addEventListener('click', () => { shown += 6; render(); });
 
       document.getElementById('submit-form').addEventListener('submit', async (e) => {
         e.preventDefault();

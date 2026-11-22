@@ -611,10 +611,13 @@ checkSession();async function loadRecipes() {
   const items = await api('/api/admin/recipes');
   $('#recipes-table').innerHTML = items.length
     ? items.map((r) => `<tr>
-        <td><b>${esc(r.title)}</b></td>
+        <td><b>${esc(r.title)}</b>${r.status === 'pending' ? ' <span class="pill demo">pendiente</span>' : ''}</td>
         <td>${esc(r.origin || '')}</td>
         <td>${esc(r.source_name || '')}</td>
-        <td><button class="btn-a small" style="background:#b3261e" data-del-rc="${r.id}">Borrar</button></td>
+        <td>
+          ${r.status === 'pending' ? '<button class="btn-a small" style="background:#166534" data-appr-rc="' + r.id + '">Aprobar</button> ' : ''}
+          <button class="btn-a small" style="background:#b3261e" data-del-rc="${r.id}">Borrar</button>
+        </td>
       </tr>`).join('')
     : '<tr><td colspan="4">Sin recetas.</td></tr>';
 
@@ -623,6 +626,15 @@ checkSession();async function loadRecipes() {
       try {
         await api('/api/admin/recipes/' + b.dataset.delRc, 'DELETE');
         notify('Receta eliminada');
+        await loadRecipes();
+      } catch (e) { notify(e.message, true); }
+    })
+  );
+  $('#recipes-table').querySelectorAll('[data-appr-rc]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/recipes/' + b.dataset.apprRc, 'PATCH', { status: 'approved' });
+        notify('Receta aprobada');
         await loadRecipes();
       } catch (e) { notify(e.message, true); }
     })
