@@ -299,7 +299,7 @@ async function initArticle() {
           let hIdx = content.indexOf('# ' + (n.title || ''));
           if (hIdx === -1) hIdx = content.lastIndexOf('# ');
           if (hIdx !== -1) content = content.slice(hIdx);
-          const endMarkers = ['\\n Etiquetas ', '\\n Etiquetas\\n', '\\n Noticias de hoy', '\\n Lo m�s', '\\n S�guenos ', '\\n Secciones '];
+const endMarkers = ['\n Etiquetas ', '\n Etiquetas\n', '\n Noticias de hoy', '\n Lo más', '\n Síguenos ', '\n Secciones '];
           let cut = content.length;
           for (const m of endMarkers) {
             const i = content.indexOf(m);
