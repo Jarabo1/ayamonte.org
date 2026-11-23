@@ -106,6 +106,7 @@ function renderChrome(activeSlug = '') {
               <li><a href="/aviso-legal">Aviso legal</a></li>
               <li><a href="/sitemap.xml">Sitemap</a></li>
               <li><a href="/admin">Panel de administración</a></li>
+               <li><a href="mailto:ayamonte@ayamonte.org">Contacto: ayamonte@ayamonte.org</a></li>
             </ul>
           </div>
         </div>
