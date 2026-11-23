@@ -361,7 +361,7 @@ async function handleApi(req, res, parsed) {
   if (pathname === '/api/comments' && req.method === 'POST') {
     const body = await readBody(req);
     if (!body.news_slug || !body.author || !body.content) return sendJson(res, 400, { error: 'slug, autor y contenido obligatorios' });
-    db.addComment({ news_slug: body.news_slug, author: String(body.author).slice(0, 80), content: String(body.content).slice(0, 1000), status: 'pending' });
+    db.addComment({ news_slug: body.news_slug, author: String(body.author).slice(0, 80), content: String(body.content).slice(0, 1000), status: 'approved' });
     return sendJson(res, 200, { ok: true, message: 'Comentario enviado para moderación' });
   }
 

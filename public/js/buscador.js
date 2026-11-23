@@ -211,10 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!author || !content) { msg.textContent = 'Completa nombre y comentario.'; msg.style.color = 'var(--accent-red)'; return; }
       try {
         await API.send('/api/comments', 'POST', { news_slug: slug, author, content });
-        msg.textContent = 'Comentario enviado. Será publicado tras moderación.';
+        msg.textContent = 'Comentario publicado.';
         msg.style.color = 'var(--success)';
         document.getElementById('comment-form').reset();
-        // recargar comentarios (solo aprobados, así que no aparecerá hasta aprobar)
+        loadComments(slug);
       } catch (err) {
         msg.textContent = 'Error: ' + err.message;
         msg.style.color = 'var(--accent-red)';
