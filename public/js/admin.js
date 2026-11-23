@@ -124,8 +124,8 @@ $$('.admin-nav button').forEach((b) => {
         news: loadNews,
         sources: loadSources,
         agenda: loadAgenda,
-        comments: loadComments,
         recipes: loadRecipes,
+        comments: loadComments,
         config: loadConfig,
         history: loadHistory,
         errors: loadErrors
@@ -660,7 +660,8 @@ document.getElementById('recipe-form').addEventListener('submit', async (e) => {
   } catch (e) { notify(e.message, true); }
 });
 
-async function loadComments() {
+
+async function loadComments() {
   const items = await api('/api/admin/comments');
   $('#comments-table').innerHTML = items.length
     ? items.map((c) => `<tr>
@@ -696,3 +697,107 @@ document.getElementById('recipe-form').addEventListener('submit', async (e) => {
 }
 
 
+
+async function loadRecipes() {
+  const items = await api('/api/admin/recipes');
+  $('#recipes-table').innerHTML = items.length
+    ? items.map((r) => `<tr>
+        <td><b>${esc(r.title)}</b>${r.status === 'pending' ? ' <span class="pill demo">pendiente</span>' : ''}</td>
+        <td>${esc(r.origin || '')}</td>
+        <td>${esc(r.source_name || '')}</td>
+        <td>
+          ${r.status === 'pending' ? '<button class="btn-a small" style="background:#166534" data-appr-rc="' + r.id + '">Aprobar</button> ' : ''}
+          <button class="btn-a small" style="background:#3b82f6" data-edit-rc="${r.id}">Editar</button>
+          <button class="btn-a small" style="background:#b3261e" data-del-rc="${r.id}">Borrar</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="4">Sin recetas.</td></tr>';
+
+  $('#recipes-table').querySelectorAll('[data-del-rc]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/recipes/' + b.dataset.delRc, 'DELETE');
+        notify('Receta eliminada');
+        await loadRecipes();
+      } catch (e) { notify(e.message, true); }
+    })
+  );
+  $('#recipes-table').querySelectorAll('[data-appr-rc]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/recipes/' + b.dataset.apprRc, 'PATCH', { status: 'approved' });
+        notify('Receta aprobada');
+        await loadRecipes();
+      } catch (e) { notify(e.message, true); }
+    })
+  );
+  $('#recipes-table').querySelectorAll('[data-edit-rc]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      const id = Number(b.dataset.editRc);
+      const item = items.find((x) => x.id === id);
+      if (!item) return;
+      document.getElementById('rc-title').value = item.title || '';
+      document.getElementById('rc-origin').value = item.origin || '';
+      document.getElementById('rc-ingredients').value = item.ingredients || '';
+      document.getElementById('rc-steps').value = item.steps || '';
+      document.getElementById('rc-source').value = item.source_name || '';
+      document.getElementById('rc-url').value = item.source_url || '';
+      const btn = document.querySelector('#recipe-form button[type="submit"]');
+      btn.textContent = 'Guardar cambios';
+      btn.dataset.editId = id;
+      window.scrollTo({ top: document.getElementById('view-recipes').offsetTop, behavior: 'smooth' });
+    })
+  );
+}
+
+document.getElementById('recipe-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.querySelector('#recipe-form button[type="submit"]');
+  const editId = btn.dataset.editId;
+  const payload = {
+    title: document.getElementById('rc-title').value.trim(),
+    origin: document.getElementById('rc-origin').value.trim(),
+    ingredients: document.getElementById('rc-ingredients').value.trim(),
+    steps: document.getElementById('rc-steps').value.trim(),
+    source_name: document.getElementById('rc-source').value.trim(),
+    source_url: document.getElementById('rc-url').value.trim()
+  };
+  try {
+    if (editId) {
+      await api('/api/admin/recipes/' + editId, 'PATCH', payload);
+      notify('Receta actualizada');
+      delete btn.dataset.editId;
+      btn.textContent = 'Añadir';
+    } else {
+      await api('/api/admin/recipes', 'POST', payload);
+      notify('Receta añadida');
+    }
+    document.getElementById('recipe-form').reset();
+    await loadRecipes();
+  } catch (e) { notify(e.message, true); }
+});
+
+async function loadComments() {
+  const items = await api('/api/admin/comments');
+  $('#comments-table').innerHTML = items.length
+    ? items.map((c) => `<tr>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.news_slug)}</td>
+        <td>${esc(c.author)}</td>
+        <td style="max-width:300px">${esc(c.content)}</td>
+        <td style="font-size:.8rem">${esc(c.created_at)}</td>
+        <td>
+          <button class="btn-a small" style="background:#b3261e" data-del-cm="${c.id}">Borrar</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="5">Sin comentarios.</td></tr>';
+
+  $('#comments-table').querySelectorAll('[data-del-cm]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await api('/api/admin/comments/' + b.dataset.delCm, 'DELETE');
+        notify('Comentario eliminado');
+        await loadComments();
+      } catch (e) { notify(e.message, true); }
+    })
+  );
+}
