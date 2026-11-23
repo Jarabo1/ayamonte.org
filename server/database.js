@@ -640,7 +640,7 @@ function addRecipe(item) {
 function updateRecipe(id, fields) {
   const sets = [];
   const vals = [];
-  const allowed = ['title', 'origin', 'ingredients', 'steps', 'source_name', 'source_url', 'image_url'];
+  const allowed = ['title', 'origin', 'ingredients', 'steps', 'source_name', 'source_url', 'image_url', 'status'];
   for (const k of allowed) {
     if (fields[k] !== undefined) {
       sets.push(`${k} = ?`);
