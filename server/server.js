@@ -174,9 +174,6 @@ function serveStatic(req, res, urlPath) {
   if (cleanRel === '/resumen' || cleanRel === '/en-2-minutos') {
     return serveFile(res, path.join(PUBLIC_DIR, 'resumen.html'), '.html');
   }
-  if (cleanRel === '/chat' || cleanRel === '/asistente') {
-    return serveFile(res, path.join(PUBLIC_DIR, 'chat.html'), '.html');
-  }
   if (cleanRel === '/tiempo' || cleanRel === '/tiempo-y-mareas') {
     return serveFile(res, path.join(PUBLIC_DIR, 'tiempo.html'), '.html');
   }
@@ -628,7 +625,7 @@ function serveSitemap(req, res) {
     { loc: `${origin}/privacidad`, priority: '0.2', changefreq: 'monthly' },
     { loc: `${origin}/recorrido-3d`, priority: '0.5', changefreq: 'monthly' },
     { loc: `${origin}/resumen`, priority: '0.7', changefreq: 'daily' },
-    { loc: `${origin}/chat`, priority: '0.4', changefreq: 'monthly' },
+
     { loc: `${origin}/tiempo`, priority: '0.6', changefreq: 'daily' },
     { loc: `${origin}/recetas`, priority: '0.6', changefreq: 'weekly' },
     { loc: `${origin}/aviso-legal`, priority: '0.2', changefreq: 'monthly' },
